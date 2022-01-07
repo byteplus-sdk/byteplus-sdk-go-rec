@@ -67,7 +67,6 @@ func (receiver *clientBuilder) Region(region core.Region) *clientBuilder {
 }
 
 const (
-	saasTenant      = "saas"
 	volcAuthService = "air"
 )
 

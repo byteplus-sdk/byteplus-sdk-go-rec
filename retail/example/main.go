@@ -30,49 +30,29 @@ var (
 )
 
 const (
-	// tenantID
-	// The account id of byteplus
-	tenantID = "xxxx"
 
-	// ProjectID
 	// A unique identity assigned by Bytedance.
-	ProjectID = "xxxxx"
+	projectID = "***********"
 
-	// ModelID
-	// Unique id for this model.The saas model id that can be used to get rec results from predict api, which is need to fill in URL.
-	ModelID = "xxxxx"
-
-	/*
-	 * stage Enumerated values, corresponding to the three synchronization stages of the recommendation platform
-	 */
-	// DataUsageTypeTrial Test data/pre-synchronization stage
-	DataUsageTypeTrial = "pre_sync"
-
-	// DataUsageTypeProduction Historical data synchronization stage
-	DataUsageTypeProduction = "history_sync"
-
-	// DataUsageTypeRealtimeData Incremental real-time data synchronization stage
-	DataUsageTypeRealtimeData = "incremental_sync_streaming"
-
-	TopicUser      = "user"
-	TopicProduct   = "goods"
-	TopicUserEvent = "behavior"
+	// Unique id for this model.
+	// The saas model id that can be used to get rec results from predict api, which is need to fill in URL.
+	modelID = "***********"
 )
 
 func init() {
 	logs.Level = logs.LevelDebug
 	var err error
 	client, err = retail.NewClientBuilder().
-		TenantID(tenantID). // Required
-		Region(region.SG).  // Required
-		AK("123").          // Required
-		SK("321").          // Required
+		TenantID("***********"). // Required. The account id of byteplus.
+		Region(region.SG).       // Required. The region of the server used to provide service.
+		AK("***********").       // Required. Access Key, used to generate request signature.
+		SK("***********").       // Required. Secure key, used to generate request signature.
 		//Schema("https"). // Optional
-		//Hosts([]string{"127.0.0.1"}). //Optional
+		//Hosts([]string{"rec-api-sg1.recplusapi.com"}). // Optional.
 		//Headers(map[string]string{"Customer-Header": "Value"}). // Optional
 		Build()
 	if err != nil {
-		panic(fmt.Sprintf("init err:%s", err.Error()))
+		panic(fmt.Sprintf("byteplus rec sdk init err:%s", err.Error()))
 	}
 }
 
@@ -120,8 +100,8 @@ func buildWriteUsersRequest(count int) *protocol.WriteDataRequest {
 		marshalUsers = append(marshalUsers, string(marshalUser))
 	}
 	return &protocol.WriteDataRequest{
-		ProjectId: ProjectID,
-		Stage:     DataUsageTypeTrial,
+		ProjectId: projectID,
+		Stage:     retail.StageTrial,
 		Data:      marshalUsers,
 		Extra:     map[string]string{"extra_info": "extra"},
 	}
@@ -152,8 +132,8 @@ func buildWriteProductsRequest(count int) *protocol.WriteDataRequest {
 		marshalProducts = append(marshalProducts, string(marshalProduct))
 	}
 	return &protocol.WriteDataRequest{
-		ProjectId: ProjectID,
-		Stage:     DataUsageTypeTrial,
+		ProjectId: projectID,
+		Stage:     retail.StageTrial,
 		Data:      marshalProducts,
 		Extra:     map[string]string{"extra_info": "extra"},
 	}
@@ -184,8 +164,8 @@ func buildWriteUserEventsRequest(count int) *protocol.WriteDataRequest {
 		marshalUserEvents = append(marshalUserEvents, string(marshalUserEvent))
 	}
 	return &protocol.WriteDataRequest{
-		ProjectId: ProjectID,
-		Stage:     DataUsageTypeTrial,
+		ProjectId: projectID,
+		Stage:     retail.StageTrial,
 		Data:      marshalUserEvents,
 		Extra:     map[string]string{"extra_info": "extra"},
 	}
@@ -231,8 +211,8 @@ func buildPredictRequest() *protocol.PredictRequest {
 		CandidateProductIds: []string{"pid1", "pid2"},
 	}
 	return &protocol.PredictRequest{
-		ProjectId: ProjectID,
-		ModelId:   ModelID,
+		ProjectId: projectID,
+		ModelId:   modelID,
 		UserId:    "userId",
 		Size:      20,
 		Scene:     scene,

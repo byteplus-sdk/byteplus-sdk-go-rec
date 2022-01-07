@@ -31,7 +31,7 @@ func (c *clientImpl) Release() {
 
 func checkPredictRequest(projectId string, modelId string) error {
 	const (
-		errMsgFormat      = "%s,field can not empty"
+		errMsgFormat      = "%s field can't be empty"
 		errFieldProjectId = "projectId"
 		errFieldModelId   = "modelId"
 	)
@@ -50,7 +50,7 @@ func checkPredictRequest(projectId string, modelId string) error {
 
 func checkUploadDataRequest(projectId string, stage string) error {
 	const (
-		errMsgFormat      = "%s,field can not empty"
+		errMsgFormat      = "%s field can't' be empty"
 		errFieldProjectId = "projectId"
 		errFieldStage     = "stage"
 	)
@@ -67,7 +67,8 @@ func checkUploadDataRequest(projectId string, stage string) error {
 	return errors.New(fmt.Sprintf(errMsgFormat, strings.Join(emptyParams, ",")))
 }
 
-func (c *clientImpl) doWrite(request *protocol.WriteDataRequest, url string, opts ...option.Option) (*protocol.WriteResponse, error) {
+func (c *clientImpl) doWrite(request *protocol.WriteDataRequest,
+	url string, opts ...option.Option) (*protocol.WriteResponse, error) {
 	if err := checkUploadDataRequest(request.ProjectId, request.Stage); err != nil {
 		return nil, err
 	}
@@ -105,19 +106,23 @@ func withSaasHeader() option.Option {
 	}
 }
 
-func (c *clientImpl) WriteUsers(writeRequest *protocol.WriteDataRequest, opts ...option.Option) (*protocol.WriteResponse, error) {
+func (c *clientImpl) WriteUsers(writeRequest *protocol.WriteDataRequest,
+	opts ...option.Option) (*protocol.WriteResponse, error) {
 	return c.doWrite(writeRequest, "/RetailSaaS/WriteUsers", opts...)
 }
 
-func (c *clientImpl) WriteProducts(writeRequest *protocol.WriteDataRequest, opts ...option.Option) (*protocol.WriteResponse, error) {
+func (c *clientImpl) WriteProducts(writeRequest *protocol.WriteDataRequest,
+	opts ...option.Option) (*protocol.WriteResponse, error) {
 	return c.doWrite(writeRequest, "/RetailSaaS/WriteProducts", opts...)
 }
 
-func (c *clientImpl) WriteUserEvents(writeRequest *protocol.WriteDataRequest, opts ...option.Option) (*protocol.WriteResponse, error) {
+func (c *clientImpl) WriteUserEvents(writeRequest *protocol.WriteDataRequest,
+	opts ...option.Option) (*protocol.WriteResponse, error) {
 	return c.doWrite(writeRequest, "/RetailSaaS/WriteUserEvents", opts...)
 }
 
-func (c *clientImpl) Predict(request *protocol.PredictRequest, opts ...option.Option) (*protocol.PredictResponse, error) {
+func (c *clientImpl) Predict(request *protocol.PredictRequest,
+	opts ...option.Option) (*protocol.PredictResponse, error) {
 	if err := checkPredictRequest(request.ProjectId, request.ModelId); err != nil {
 		return nil, err
 	}
@@ -126,7 +131,8 @@ func (c *clientImpl) Predict(request *protocol.PredictRequest, opts ...option.Op
 	}
 	response := &protocol.PredictResponse{}
 	opts = addSaasFlag(opts)
-	err := c.httpClient.DoPbRequest("/RetailSaaS/Predict", request, response, option.Conv2Options(opts...))
+	err := c.httpClient.DoPbRequest("/RetailSaaS/Predict",
+		request, response, option.Conv2Options(opts...))
 	if err != nil {
 		return nil, err
 	}
@@ -144,7 +150,8 @@ func (c *clientImpl) AckServerImpressions(request *protocol.AckServerImpressions
 	}
 	response := &protocol.AckServerImpressionsResponse{}
 	opts = addSaasFlag(opts)
-	err := c.httpClient.DoPbRequest("/RetailSaaS/AckServerImpressions", request, response, option.Conv2Options(opts...))
+	err := c.httpClient.DoPbRequest("/RetailSaaS/AckServerImpressions",
+		request, response, option.Conv2Options(opts...))
 	if err != nil {
 		return nil, err
 	}

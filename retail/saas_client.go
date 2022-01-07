@@ -6,8 +6,6 @@ import (
 )
 
 type Client interface {
-	// Release
-	// release resources
 	Release()
 
 	// WriteUsers
@@ -56,5 +54,6 @@ type Client interface {
 	//   {id:4, altered_reason: "kept", rank:4},
 	//   {id:3, altered_reason: "filtered", rank:0},
 	// ].
-	AckServerImpressions(request *protocol.AckServerImpressionsRequest, opts ...option.Option) (*protocol.AckServerImpressionsResponse, error)
+	AckServerImpressions(request *protocol.AckServerImpressionsRequest,
+		opts ...option.Option) (*protocol.AckServerImpressionsResponse, error)
 }
