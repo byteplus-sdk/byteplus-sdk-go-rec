@@ -1,9 +1,7 @@
 package main
 
 import (
-	"encoding/json"
 	"strconv"
-	"time"
 
 	"github.com/byteplus-sdk/byteplus-sdk-go-rec/retail/protocol"
 )
@@ -19,19 +17,18 @@ func mockUsers(count int) []*DemoUser {
 }
 
 func mockUser() *DemoUser {
-	tags, _ := json.Marshal([]string{"tag1", "tag2", "tag3"})
 	return &DemoUser{
-		UserId:                 "user_id",
+		UserId:                 "1457789",
 		Gender:                 "male",
 		Age:                    "23",
-		Tags:                   string(tags),
+		Tags:                   `["new user","low purchasing power","bargain seeker"]`,
 		ActivationChannel:      "AppStore",
 		MembershipLevel:        "silver",
-		RegistrationTimestamp:  time.Now().Unix(),
-		LocationCity:           "beijing",
-		LocationCountry:        "china",
-		LocationDistrictOrArea: "haidian",
-		LocationPostcode:       "123456",
+		RegistrationTimestamp:  1623593487,
+		LocationCity:           "Kirkland",
+		LocationCountry:        "USA",
+		LocationDistrictOrArea: "King County",
+		LocationPostcode:       "98033",
 		//CustomField:                   "custom",
 	}
 }
@@ -47,52 +44,27 @@ func mockProducts(count int) []*DemoProduct {
 }
 
 func mockProduct() *DemoProduct {
-	category1Node1 := &ProductCategoryCategoryNode{
-		IdOrName: "cate_1_1",
-	}
-	category1 := &Category{
-		CategoryDepth: 1,
-		CategoryNodes: []*ProductCategoryCategoryNode{category1Node1},
-	}
-	category2Node1 := &ProductCategoryCategoryNode{
-		IdOrName: "cate_2_1",
-	}
-	category2Node2 := &ProductCategoryCategoryNode{
-		IdOrName: "cate_2_2",
-	}
-	category2 := &Category{
-		CategoryDepth: 2,
-		CategoryNodes: []*ProductCategoryCategoryNode{category2Node1, category2Node2},
-	}
-	category := []*Category{category1, category2}
-	categoryStr, _ := json.Marshal(category)
-	tags := []string{"tag1", "tag2", "tag3"}
-	tagsStr, _ := json.Marshal(tags)
-	displayDetailPageDisplayTags := []string{"tag1", "tag2"}
-	displayDetailPageDisplayTagsStr, _ := json.Marshal(displayDetailPageDisplayTags)
-	displayListingPageDisplayTags := []string{"taga", "tagb"}
-	displayListingPageDisplayTagsStr, _ := json.Marshal(displayListingPageDisplayTags)
 	return &DemoProduct{
-		ProductId:                     "product_id",
-		Category:                      string(categoryStr),
-		Brands:                        "brand_1",
-		PriceCurrentPrice:             1000,
-		PriceOriginPrice:              1000,
+		ProductId:                     "632461",
+		Category:                      `[{"category_depth":1,"category_nodes":[{"id_or_name":"Shoes"}]},{"category_depth":2,"category_nodes":[{"id_or_name":"Men's Shoes"}]}]`,
+		Brands:                        "Adidas",
+		PriceCurrentPrice:             49900,
+		PriceOriginPrice:              69900,
 		IsRecommendable:               true,
-		Title:                         "title",
-		QualityScore:                  3.4,
-		Tags:                          string(tagsStr),
-		DisplayDetailPageDisplayTags:  string(displayDetailPageDisplayTagsStr),
-		DisplayCoverMultimediaUrl:     "https://www.google.com",
-		DisplayListingPageDisplayTags: string(displayListingPageDisplayTagsStr),
+		Title:                         "adidas Men's Yeezy Boost 350 V2 Grey/Borang/Dgsogr",
+		QualityScore:                  4.4,
+		Tags:                          `["New Product","Summer Product"]`,
+		DisplayDetailPageDisplayTags:  `["FreeShipping","Return in 7 days without any reasons"]`,
+		DisplayCoverMultimediaUrl:     "https://images-na.ssl-images-amazon.com/images/I/81WmojBxvbL._AC_UL1500_.jpg",
+		DisplayListingPageDisplayTags: `["best seller","hot sales"]`,
 		DisplayListingPageDisplayType: "image",
-		ProductSpecProductGroupId:     "group_id",
+		ProductSpecProductGroupId:     "1356",
 		ProductSpecCommentCount:       100,
-		ProductSpecPublishTimestamp:   time.Now().Unix(),
+		ProductSpecPublishTimestamp:   1623193487,
 		ProductSpecSource:             "self",
-		ProductSpecUserRating:         0.23,
-		SellerId:                      "seller_id",
-		SellerSellerLevel:             "level1",
+		ProductSpecUserRating:         0.25,
+		SellerId:                      "43485",
+		SellerSellerLevel:             "1",
 		SellerSellerRating:            3.5,
 		//CustomField:                   "custom",
 	}
@@ -108,101 +80,97 @@ func mockUserEvents(count int) []*DemoUserEvent {
 
 func mockUserEvent() *DemoUserEvent {
 	return &DemoUserEvent{
-		UserId:               "user_id",
+		UserId:               "1457789",
 		EventType:            "purchase",
-		EventTimestamp:       time.Now().Unix(),
-		Scene:                "scene_name",
+		EventTimestamp:       1623681888,
+		Scene:                "product detail page",
 		ScenePageNumber:      2,
 		SceneOffset:          10,
-		ProductId:            "product_id",
+		ProductId:            "632461",
 		DevicePlatform:       "app",
 		DeviceOsType:         "android",
-		DeviceAppVersion:     "app_version",
-		DeviceDeviceModel:    "device_model",
-		DeviceDeviceBrand:    "device_brand",
-		DeviceOsVersion:      "os_version",
-		DeviceBrowserType:    "firefox",
-		DeviceUserAgent:      "user_agent",
+		DeviceAppVersion:     "9.2.0",
+		DeviceDeviceModel:    "huawei-mate30",
+		DeviceDeviceBrand:    "huawei",
+		DeviceOsVersion:      "10",
+		DeviceBrowserType:    "chrome",
+		DeviceUserAgent:      "Mozilla/5.0 (Linux; Android 10; TAS-AN00; HMSCore 5.3.0.312) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.106 HuaweiBrowser/11.0.8.303 Mobile Safari/537.36",
 		DeviceNetwork:        "3g",
-		ContextQuery:         "query",
-		ContextRootProductId: "root_product_id",
-		AttributionToken:     "attribution_token",
-		RecInfo:              "trans_data",
+		ContextQuery:         "iPad",
+		ContextRootProductId: "441356",
+		AttributionToken:     "eyJpc3MiOiJuaW5naGFvLm5ldCIsImV4cCI6IjE0Mzg5NTU0NDUiLCJuYW1lIjoid2FuZ2hhbyIsImFkbWluIjp0cnVlfQ",
+		RecInfo:              "CiRiMjYyYjM1YS0xOTk1LTQ5YmMtOGNkNS1mZTVmYTczN2FkNDASJAobcmVjZW50X2hvdF9jbGlja3NfcmV0cmlldmVyFQAAAAAYDxoKCgNjdHIdog58PBoKCgNjdnIdANK2OCIHMjcyNTgwMg==",
 		TrafficSource:        "self",
 		PurchaseCount:        20,
-		// 10s
-		DetailPageStayTime: 10,
+		DetailPageStayTime:   10, // 10 seconds
 		//CustomField:                   "custom",
 	}
 }
 
 func mockPredictProduct() *protocol.Product {
 	category1Node1 := &protocol.Product_Category_CategoryNode{
-		IdOrName: "cate_1_1",
+		IdOrName: "Shoes",
 	}
 	category1 := &protocol.Product_Category{
 		CategoryDepth: 1,
 		CategoryNodes: []*protocol.Product_Category_CategoryNode{category1Node1},
 	}
 	category2Node1 := &protocol.Product_Category_CategoryNode{
-		IdOrName: "cate_2_1",
-	}
-	category2Node2 := &protocol.Product_Category_CategoryNode{
-		IdOrName: "cate_2_2",
+		IdOrName: "Men's Shoes",
 	}
 	category2 := &protocol.Product_Category{
 		CategoryDepth: 2,
-		CategoryNodes: []*protocol.Product_Category_CategoryNode{category2Node1, category2Node2},
+		CategoryNodes: []*protocol.Product_Category_CategoryNode{category2Node1},
 	}
 
 	brand1 := &protocol.Product_Brand{
 		BrandDepth: 1,
-		IdOrName:   "brand_1",
+		IdOrName:   "Adidas",
 	}
 	brand2 := &protocol.Product_Brand{
 		BrandDepth: 2,
-		IdOrName:   "brand_2",
+		IdOrName:   "Yeezy",
 	}
 
 	price := &protocol.Product_Price{
-		CurrentPrice: 10,
-		OriginPrice:  10,
+		CurrentPrice: 49900,
+		OriginPrice:  69900,
 	}
 
 	display := &protocol.Product_Display{
-		DetailPageDisplayTags:  []string{"tag1", "tag2"},
-		ListingPageDisplayTags: []string{"taga", "tagb"},
+		DetailPageDisplayTags:  []string{"FreeShipping", "Return in 7 days without any reasons"},
+		ListingPageDisplayTags: []string{"best seller", "hot sales"},
 		ListingPageDisplayType: "image",
-		CoverMultimediaUrl:     "https://www.google.com",
+		CoverMultimediaUrl:     "https://images-na.ssl-images-amazon.com/images/I/81WmojBxvbL._AC_UL1500_.jpg",
 	}
 
 	spec := &protocol.Product_ProductSpec{
-		ProductGroupId:   "group_id",
-		UserRating:       0.23,
+		ProductGroupId:   "1356",
+		UserRating:       0.25,
 		CommentCount:     100,
 		Source:           "self",
-		PublishTimestamp: time.Now().Unix(),
+		PublishTimestamp: 1623193487,
 	}
 
 	seller := &protocol.Product_Seller{
-		Id:           "seller_id",
-		SellerLevel:  "level1",
+		Id:           "43485",
+		SellerLevel:  "1",
 		SellerRating: 3.5,
 	}
 
 	return &protocol.Product{
-		ProductId:       "product_id",
+		ProductId:       "632461",
 		Categories:      []*protocol.Product_Category{category1, category2},
 		Brands:          []*protocol.Product_Brand{brand1, brand2},
 		Price:           price,
 		IsRecommendable: true,
-		Title:           "title",
-		QualityScore:    3.4,
-		Tags:            []string{"tag1", "tag2", "tag3"},
+		Title:           "adidas Men's Yeezy Boost 350 V2 Grey/Borang/Dgsogr",
+		QualityScore:    4.4,
+		Tags:            []string{"New Product", "Summer Product"},
 		Display:         display,
 		ProductSpec:     spec,
 		Seller:          seller,
-		Extra:           map[string]string{"count": "20"},
+		Extra:           map[string]string{"count": "20", "color": "white"},
 	}
 }
 
@@ -210,12 +178,12 @@ func mockPredictDevice() *protocol.Device {
 	return &protocol.Device{
 		Platform:    "app",
 		OsType:      "android",
-		AppVersion:  "app_version",
-		DeviceModel: "device_model",
-		DeviceBrand: "device_brand",
-		OsVersion:   "os_version",
-		BrowserType: "firefox",
-		UserAgent:   "user_agent",
+		AppVersion:  "9.2.0",
+		DeviceModel: "huawei-mate30",
+		DeviceBrand: "huawei",
+		OsVersion:   "10",
+		BrowserType: "chrome",
+		UserAgent:   "Mozilla/5.0 (Linux; Android 10; TAS-AN00; HMSCore 5.3.0.312) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.106 HuaweiBrowser/11.0.8.303 Mobile Safari/537.36",
 		Network:     "3g",
 	}
 }

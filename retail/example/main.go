@@ -30,7 +30,6 @@ var (
 )
 
 const (
-
 	// A unique identity assigned by Bytedance.
 	projectID = "***********"
 
@@ -192,7 +191,7 @@ func recommendExample() {
 	ackOpts := defaultOptions(DefaultAckImpressionsTimeout)
 	// async ack the actual impressions after this recommendation
 	core.AsyncExecute(func() {
-		core.DoWithRetry(DefaultRetryTimes, func() error {
+		_ = core.DoWithRetry(DefaultRetryTimes, func() error {
 			_, err := client.AckServerImpressions(ackRequest, ackOpts...)
 			return err
 		})
@@ -201,19 +200,19 @@ func recommendExample() {
 
 func buildPredictRequest() *protocol.PredictRequest {
 	scene := &protocol.Scene{
-		SceneName: "home",
+		Offset: 10,
 	}
 	rootProduct := mockPredictProduct()
 	device := mockPredictDevice()
 	context := &protocol.PredictRequest_Context{
 		RootProduct:         rootProduct,
 		Device:              device,
-		CandidateProductIds: []string{"pid1", "pid2"},
+		CandidateProductIds: []string{"632462", "632463"},
 	}
 	return &protocol.PredictRequest{
 		ProjectId: projectID,
 		ModelId:   modelID,
-		UserId:    "userId",
+		UserId:    "1457789",
 		Size:      20,
 		Scene:     scene,
 		Context:   context,
@@ -221,7 +220,8 @@ func buildPredictRequest() *protocol.PredictRequest {
 	}
 }
 
-func recommendWithPredictResult(predictResult *protocol.PredictResult) []*protocol.AckServerImpressionsRequest_AlteredProduct {
+func recommendWithPredictResult(
+	predictResult *protocol.PredictResult) []*protocol.AckServerImpressionsRequest_AlteredProduct {
 	// You can handle recommend results here,
 	// such as filter, insert other items, sort again, etc.
 	// The list of goods finally displayed to user and the filtered goods
@@ -229,7 +229,8 @@ func recommendWithPredictResult(predictResult *protocol.PredictResult) []*protoc
 	return conv2AlteredProducts(predictResult.GetResponseProducts())
 }
 
-func conv2AlteredProducts(products []*protocol.PredictResult_ResponseProduct) []*protocol.AckServerImpressionsRequest_AlteredProduct {
+func conv2AlteredProducts(
+	products []*protocol.PredictResult_ResponseProduct) []*protocol.AckServerImpressionsRequest_AlteredProduct {
 	if len(products) == 0 {
 		return nil
 	}

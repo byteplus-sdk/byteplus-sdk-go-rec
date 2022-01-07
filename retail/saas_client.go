@@ -35,7 +35,7 @@ type Client interface {
 	// Gets the list of products (ranked).
 	// The updated user data will take effect in 24 hours.
 	// The updated product data will take effect in 30 mins.
-	// Depending how (realtime or batch) the UserEvents are sent back, it will
+	// Depending on how (realtime or batch) the UserEvents are sent back, it will
 	// be fed into the models and take effect after that.
 	Predict(request *protocol.PredictRequest, opts ...option.Option) (*protocol.PredictResponse, error)
 

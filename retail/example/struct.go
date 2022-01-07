@@ -4,7 +4,7 @@ type DemoUser struct {
 	UserId                 string `json:"user_id,omitempty"`
 	Gender                 string `json:"gender,omitempty"`
 	Age                    string `json:"age,omitempty"`
-	Tags                   string `json:"tags,omitempty"`
+	Tags                   string `json:"tags,omitempty"` // json array
 	ActivationChannel      string `json:"activation_channel,omitempty"`
 	MembershipLevel        string `json:"membership_level,omitempty"`
 	RegistrationTimestamp  int64  `json:"registration_timestamp,omitempty"`
@@ -17,18 +17,18 @@ type DemoUser struct {
 
 type DemoProduct struct {
 	ProductId                     string  `json:"product_id,omitempty"`
-	Category                      string  `json:"category,omitempty"`
+	Category                      string  `json:"category,omitempty"` // json array
 	Brands                        string  `json:"brands,omitempty"`
 	IsRecommendable               bool    `json:"is_recommendable,omitempty"`
 	Title                         string  `json:"title,omitempty"`
 	PriceCurrentPrice             int64   `json:"price_current_price,omitempty"`
 	PriceOriginPrice              int64   `json:"price_origin_price,omitempty"`
 	QualityScore                  float64 `json:"quality_score,omitempty"`
-	Tags                          string  `json:"tags,omitempty"`
+	Tags                          string  `json:"tags,omitempty"` // json array
 	DisplayCoverMultimediaUrl     string  `json:"display_cover_multimedia_url,omitempty"`
 	DisplayListingPageDisplayType string  `json:"display_listing_page_display_type,omitempty"`
-	DisplayListingPageDisplayTags string  `json:"display_listing_page_display_tags,omitempty"`
-	DisplayDetailPageDisplayTags  string  `json:"display_detail_page_display_tags,omitempty"`
+	DisplayListingPageDisplayTags string  `json:"display_listing_page_display_tags,omitempty"` // json array
+	DisplayDetailPageDisplayTags  string  `json:"display_detail_page_display_tags,omitempty"`  // json array
 	SellerId                      string  `json:"seller_id,omitempty"`
 	SellerSellerLevel             string  `json:"seller_seller_level,omitempty"`
 	SellerSellerRating            float64 `json:"seller_seller_rating,omitempty"`
@@ -38,15 +38,6 @@ type DemoProduct struct {
 	ProductSpecSource             string  `json:"product_spec_source,omitempty"`
 	ProductSpecPublishTimestamp   int64   `json:"product_spec_publish_timestamp,omitempty"`
 	CustomField                   string  `json:"custom_field,omitempty"`
-}
-
-type Category struct {
-	CategoryDepth int32                          `json:"category_depth,omitempty"`
-	CategoryNodes []*ProductCategoryCategoryNode `json:"category_nodes,omitempty"`
-}
-
-type ProductCategoryCategoryNode struct {
-	IdOrName string `json:"id_or_name,omitempty"`
 }
 
 type DemoUserEvent struct {
