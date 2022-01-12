@@ -11,7 +11,6 @@ type clientBuilder struct {
 	schema     string
 	hosts      []string
 	hostHeader string
-	headers    map[string]string
 	region     core.Region
 	ak         string
 	sk         string
@@ -56,11 +55,6 @@ func (receiver *clientBuilder) Hosts(hosts []string) *clientBuilder {
 	return receiver
 }
 
-func (receiver *clientBuilder) Headers(headers map[string]string) *clientBuilder {
-	receiver.headers = headers
-	return receiver
-}
-
 func (receiver *clientBuilder) Region(region core.Region) *clientBuilder {
 	receiver.region = region
 	return receiver
@@ -79,7 +73,6 @@ func (receiver *clientBuilder) Build() (Client, error) {
 		Schema(receiver.schema).
 		HostHeader(receiver.hostHeader).
 		Hosts(receiver.hosts).
-		Headers(receiver.headers).
 		Region(receiver.region).
 		AuthService(volcAuthService).Build()
 	if err != nil {
