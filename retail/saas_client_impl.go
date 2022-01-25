@@ -68,7 +68,7 @@ func checkUploadDataRequest(projectId string, stage string) error {
 }
 
 func (c *clientImpl) doWrite(request *protocol.WriteDataRequest,
-	url string, opts ...option.Option) (*protocol.WriteResponse, error) {
+	path string, opts ...option.Option) (*protocol.WriteResponse, error) {
 	if err := checkUploadDataRequest(request.ProjectId, request.Stage); err != nil {
 		return nil, err
 	}
@@ -80,7 +80,7 @@ func (c *clientImpl) doWrite(request *protocol.WriteDataRequest,
 	}
 	response := &protocol.WriteResponse{}
 	opts = addSaasFlag(opts)
-	err := c.httpClient.DoPbRequest(url, request, response, option.Conv2Options(opts...))
+	err := c.httpClient.DoPbRequest(path, request, response, option.Conv2Options(opts...))
 	if err != nil {
 		return nil, err
 	}
