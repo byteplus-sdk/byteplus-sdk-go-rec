@@ -48,7 +48,6 @@ func init() {
 		SK("***********").       // Required. Secure key, used to generate request signature.
 		//Schema("https"). // Optional
 		//Hosts([]string{"rec-api-sg1.recplusapi.com"}). // Optional.
-		//Headers(map[string]string{"Customer-Header": "Value"}). // Optional
 		Build()
 	if err != nil {
 		panic(fmt.Sprintf("byteplus rec sdk init err:%s", err.Error()))
