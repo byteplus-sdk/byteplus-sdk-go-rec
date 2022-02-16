@@ -61,7 +61,7 @@ func (receiver *clientBuilder) Region(region core.Region) *clientBuilder {
 }
 
 const (
-	volcAuthService = "air"
+	byteplusAuthService = "byteplus_recommend"
 )
 
 func (receiver *clientBuilder) Build() (Client, error) {
@@ -74,7 +74,7 @@ func (receiver *clientBuilder) Build() (Client, error) {
 		HostHeader(receiver.hostHeader).
 		Hosts(receiver.hosts).
 		Region(receiver.region).
-		AuthService(volcAuthService).Build()
+		AuthService(byteplusAuthService).Build()
 	if err != nil {
 		return nil, err
 	}
