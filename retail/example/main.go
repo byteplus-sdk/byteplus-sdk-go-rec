@@ -31,22 +31,23 @@ var (
 
 const (
 	// A unique identity assigned by Bytedance.
-	projectID = "***********"
+	projectID = "432941789"
 
 	// Unique id for this model.
 	// The saas model id that can be used to get rec results from predict api, which is need to fill in URL.
-	modelID = "***********"
+	modelID = "952795279527"
 )
 
 func init() {
 	logs.Level = logs.LevelDebug
 	var err error
 	client, err = retail.NewClientBuilder().
-		TenantID("***********"). // Required. The account id of byteplus.
-		Region(region.SG).       // Required. The region of the server used to provide service.
-		AK("***********").       // Required. Access Key, used to generate request signature.
-		SK("***********").       // Required. Secure key, used to generate request signature.
-		//Schema("https"). // Optional
+		TenantID("3000001729"). // Required. The account id of byteplus.
+		ProjectID(projectID).
+		Region(region.SG).                                                      // Required. The region of the server used to provide service.
+		AuthAK("AKAPMzgwYzYzN2EzMjQ2NDc3Zjg1ZmZmZmMwODAzMjg2Njk").              // Required. Access Key, used to generate request signature.
+		AuthSK("TURsbU9EZ3pOekppWkRBM05HVTVZbUl5WXpoaU5tTmhZbUprTkRKbU9HRQ=="). // Required. Secure key, used to generate request signature.
+		//Schema("https"). // Optional.
 		//Hosts([]string{"rec-api-sg1.recplusapi.com"}). // Optional.
 		Build()
 	if err != nil {
@@ -59,13 +60,13 @@ func main() {
 	writeUsersExample()
 
 	// Write real-time product data˚
-	writeProductsExample()
+	// writeProductsExample()
 
 	// Write real-time user event data
-	writeUserEventsExample()
+	// writeUserEventsExample()
 
 	// Get recommendation results
-	recommendExample()
+	// recommendExample()
 
 	// Pause for 5 seconds until the asynchronous import task completes
 	time.Sleep(5 * time.Second)
@@ -259,11 +260,23 @@ func buildAckRequest(predictRequestId string, predictRequest *protocol.PredictRe
 
 func defaultOptions(timeout time.Duration) []option.Option {
 	// All options are optional
-	//var customerHeaders map[string]string
+	// var customerHeaders map[string]string
+	// var customerQueries map[string]string
 	opts := []option.Option{
-		option.WithRequestId(uuid.NewString()),
+		option.WithRequestID(uuid.NewString()),
 		option.WithTimeout(timeout),
+		// Optional. Add a set of customer headers to the request, which will be overwritten by multiple calls.
 		//option.WithHeaders(customerHeaders),
+		// Optional. Add a set of customer queries to the request, which will be overwritten by multiple calls.
+		//option.WithQueries(customerQueries),
+		// Optional. Add a header to an existing custom header collection.
+		//option.WithHeader("key", "value"),
+		// Optional. Add a query to an existing custom query collection.
+		//option.WithQuery("key", "value"),
+		// Optional. It is expected that the server will process the data for the maximum time.
+		// If the processing time exceeds this time, the server will return the result immediately,
+		// regardless of whether there is any remaining data that has not been processed.
+		//option.WithServerTimeout(5000 * time.Millisecond),
 	}
 	return opts
 }

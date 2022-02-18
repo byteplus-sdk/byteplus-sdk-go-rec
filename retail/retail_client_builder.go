@@ -11,7 +11,7 @@ type clientBuilder struct {
 	schema     string
 	hosts      []string
 	hostHeader string
-	region     core.Region
+	region     core.IRegion
 	ak         string
 	sk         string
 }
