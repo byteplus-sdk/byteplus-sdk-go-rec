@@ -1,12 +1,15 @@
 package region
 
-import (
-	core "github.com/byteplus-sdk/byteplus-sdk-go-rec-core"
+const (
+	SG = sgRegion("BYTEPLUS_REGION_SG")
 )
 
-func init() {
-	core.RegisterRegion(SG, &core.RegionConfig{
-		Hosts:                SGHosts,
-		VolcCredentialRegion: "ap-singapore-1",
-	})
+type sgRegion string
+
+func (s sgRegion) GetHosts() []string {
+	return []string{"rec-api-sg1.recplusapi.com"}
+}
+
+func (s sgRegion) GetAuthRegion() string {
+	return "ap-singapore-1"
 }

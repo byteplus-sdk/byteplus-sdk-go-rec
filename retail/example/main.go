@@ -31,22 +31,22 @@ var (
 
 const (
 	// A unique identity assigned by Bytedance.
-	projectID = "432941789"
+	projectID = "***********"
 
 	// Unique id for this model.
 	// The saas model id that can be used to get rec results from predict api, which is need to fill in URL.
-	modelID = "952795279527"
+	modelID = "***********"
 )
 
 func init() {
 	logs.Level = logs.LevelDebug
 	var err error
 	client, err = retail.NewClientBuilder().
-		TenantID("3000001729"). // Required. The account id of byteplus.
+		TenantID("***********"). // Required. The account id of byteplus.
 		ProjectID(projectID).
-		Region(region.SG).                                                      // Required. The region of the server used to provide service.
-		AuthAK("AKAPMzgwYzYzN2EzMjQ2NDc3Zjg1ZmZmZmMwODAzMjg2Njk").              // Required. Access Key, used to generate request signature.
-		AuthSK("TURsbU9EZ3pOekppWkRBM05HVTVZbUl5WXpoaU5tTmhZbUprTkRKbU9HRQ=="). // Required. Secure key, used to generate request signature.
+		Region(region.SG).       // Required. The region of the server used to provide service.
+		AuthAK("***********").   // Required. Access Key, used to generate request signature.
+		AuthSK("***********=="). // Required. Secure key, used to generate request signature.
 		//Schema("https"). // Optional.
 		//Hosts([]string{"rec-api-sg1.recplusapi.com"}). // Optional.
 		Build()
@@ -60,13 +60,13 @@ func main() {
 	writeUsersExample()
 
 	// Write real-time product data˚
-	// writeProductsExample()
+	writeProductsExample()
 
 	// Write real-time user event data
-	// writeUserEventsExample()
+	writeUserEventsExample()
 
 	// Get recommendation results
-	// recommendExample()
+	recommendExample()
 
 	// Pause for 5 seconds until the asynchronous import task completes
 	time.Sleep(5 * time.Second)
@@ -80,7 +80,7 @@ func writeUsersExample() {
 	opts := defaultOptions(DefaultWriteTimeout)
 	response, err := client.WriteUsers(request, opts...)
 	if err != nil {
-		logs.Error("write user occur err, msg:%s", err.Error())
+		logs.Error("write user occur err, msg:%v", err)
 		return
 	}
 	if core.IsUploadSuccess(response.GetStatus().GetCode()) {
@@ -112,7 +112,7 @@ func writeProductsExample() {
 	opts := defaultOptions(DefaultWriteTimeout)
 	response, err := client.WriteProducts(request, opts...)
 	if err != nil {
-		logs.Error("write product occur err, msg:%s", err.Error())
+		logs.Error("write product occur err, msg:%v", err)
 		return
 	}
 	if core.IsUploadSuccess(response.GetStatus().GetCode()) {
@@ -144,7 +144,7 @@ func writeUserEventsExample() {
 	opts := defaultOptions(DefaultWriteTimeout)
 	response, err := client.WriteUserEvents(request, opts...)
 	if err != nil {
-		logs.Error("write user event occur err, msg:%s", err.Error())
+		logs.Error("write user event occur err, msg:%v", err)
 		return
 	}
 	if core.IsUploadSuccess(response.GetStatus().GetCode()) {
@@ -176,7 +176,7 @@ func recommendExample() {
 	// The "home" is scene name, which provided by ByteDance, usually is "home"
 	response, err := client.Predict(predictRequest, predictOpts...)
 	if err != nil {
-		logs.Error("predict occur error, msg:%s", err.Error())
+		logs.Error("predict occur error, msg:%v", err)
 		return
 	}
 	if !core.IsSuccess(response.GetStatus().GetCode()) {

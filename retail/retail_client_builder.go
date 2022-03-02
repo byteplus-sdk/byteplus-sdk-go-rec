@@ -1,33 +1,25 @@
 package retail
 
 import (
+	"errors"
+
 	core "github.com/byteplus-sdk/byteplus-sdk-go-rec-core"
 	_ "github.com/byteplus-sdk/byteplus-sdk-go-rec/region"
 )
 
 type clientBuilder struct {
-	tenantID   string
-	token      string
-	schema     string
-	hosts      []string
-	hostHeader string
-	region     core.IRegion
-	ak         string
-	sk         string
+	tenantID     string
+	projectID    string
+	airAuthToken string
+	authAK       string
+	authSK       string
+	schema       string
+	hosts        []string
+	region       core.IRegion
 }
 
 func NewClientBuilder() *clientBuilder {
 	return &clientBuilder{}
-}
-
-func (receiver *clientBuilder) AK(ak string) *clientBuilder {
-	receiver.ak = ak
-	return receiver
-}
-
-func (receiver *clientBuilder) SK(sk string) *clientBuilder {
-	receiver.sk = sk
-	return receiver
 }
 
 func (receiver *clientBuilder) TenantID(tenantID string) *clientBuilder {
@@ -35,8 +27,23 @@ func (receiver *clientBuilder) TenantID(tenantID string) *clientBuilder {
 	return receiver
 }
 
-func (receiver *clientBuilder) Token(token string) *clientBuilder {
-	receiver.token = token
+func (receiver *clientBuilder) ProjectID(projectID string) *clientBuilder {
+	receiver.projectID = projectID
+	return receiver
+}
+
+func (receiver *clientBuilder) AirAuthToken(airAuthToken string) *clientBuilder {
+	receiver.airAuthToken = airAuthToken
+	return receiver
+}
+
+func (receiver *clientBuilder) AuthAK(authAK string) *clientBuilder {
+	receiver.authAK = authAK
+	return receiver
+}
+
+func (receiver *clientBuilder) AuthSK(authSK string) *clientBuilder {
+	receiver.authSK = authSK
 	return receiver
 }
 
@@ -45,17 +52,12 @@ func (receiver *clientBuilder) Schema(schema string) *clientBuilder {
 	return receiver
 }
 
-func (receiver *clientBuilder) HostHeader(hostHeader string) *clientBuilder {
-	receiver.hostHeader = hostHeader
-	return receiver
-}
-
 func (receiver *clientBuilder) Hosts(hosts []string) *clientBuilder {
 	receiver.hosts = hosts
 	return receiver
 }
 
-func (receiver *clientBuilder) Region(region core.Region) *clientBuilder {
+func (receiver *clientBuilder) Region(region core.IRegion) *clientBuilder {
 	receiver.region = region
 	return receiver
 }
@@ -65,13 +67,18 @@ const (
 )
 
 func (receiver *clientBuilder) Build() (Client, error) {
+	err := receiver.checkRequiredField()
+	if err != nil {
+		return nil, err
+	}
 	httpClient, err := core.NewHTTPClientBuilder().
-		AK(receiver.ak).
-		SK(receiver.sk).
 		TenantID(receiver.tenantID).
-		Token(receiver.token).
+		ProjectID(receiver.projectID).
+		UseAirAuth(receiver.isUseAirAuth()).
+		AirAuthToken(receiver.airAuthToken).
+		AuthAK(receiver.authAK).
+		AuthSK(receiver.authSK).
 		Schema(receiver.schema).
-		HostHeader(receiver.hostHeader).
 		Hosts(receiver.hosts).
 		Region(receiver.region).
 		AuthService(byteplusAuthService).Build()
@@ -82,4 +89,15 @@ func (receiver *clientBuilder) Build() (Client, error) {
 		httpClient: httpClient,
 	}
 	return client, nil
+}
+
+func (receiver *clientBuilder) checkRequiredField() error {
+	if len(receiver.projectID) < 0 {
+		return errors.New("project id is empty")
+	}
+	return nil
+}
+
+func (receiver *clientBuilder) isUseAirAuth() bool {
+	return len(receiver.authAK) == 0 && len(receiver.authSK) == 0 && len(receiver.airAuthToken) > 0
 }
