@@ -6,8 +6,6 @@ import (
 )
 
 type Client interface {
-	Release()
-
 	// WriteUsers
 	//
 	// Writes at most 2000 users data at a time. Exceeding 2000 in a request results in
@@ -56,4 +54,7 @@ type Client interface {
 	// ].
 	AckServerImpressions(request *protocol.AckServerImpressionsRequest,
 		opts ...option.Option) (*protocol.AckServerImpressionsResponse, error)
+
+	//Release resource used by client
+	Release()
 }

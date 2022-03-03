@@ -1,6 +1,6 @@
 syntax = "proto3";
 package bytedance.byteplus.rec.retail;
-option java_package = "byteplus.rec.sdk.retail.protocol";
+option java_package = "com.byteplus.rec.sdk.retail.protocol";
 option go_package = "github.com/byteplus-sdk/byteplus-sdk-go-rec/retail/protocol";
 
 // The `Status` type defines a logical error model, Each `Status` message

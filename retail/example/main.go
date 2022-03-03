@@ -43,9 +43,10 @@ func init() {
 	var err error
 	client, err = retail.NewClientBuilder().
 		TenantID("***********"). // Required. The account id of byteplus.
+		ProjectID(projectID).
 		Region(region.SG).       // Required. The region of the server used to provide service.
-		AK("***********").       // Required. Access Key, used to generate request signature.
-		SK("***********").       // Required. Secure key, used to generate request signature.
+		AuthAK("***********").   // Required. Access Key, used to generate request signature.
+		AuthSK("***********=="). // Required. Secure key, used to generate request signature.
 		//Schema("https"). // Optional.
 		//Hosts([]string{"rec-api-sg1.recplusapi.com"}). // Optional.
 		Build()
@@ -79,7 +80,7 @@ func writeUsersExample() {
 	opts := defaultOptions(DefaultWriteTimeout)
 	response, err := client.WriteUsers(request, opts...)
 	if err != nil {
-		logs.Error("write user occur err, msg:%s", err.Error())
+		logs.Error("write user occur err, msg:%v", err)
 		return
 	}
 	if core.IsUploadSuccess(response.GetStatus().GetCode()) {
@@ -111,7 +112,7 @@ func writeProductsExample() {
 	opts := defaultOptions(DefaultWriteTimeout)
 	response, err := client.WriteProducts(request, opts...)
 	if err != nil {
-		logs.Error("write product occur err, msg:%s", err.Error())
+		logs.Error("write product occur err, msg:%v", err)
 		return
 	}
 	if core.IsUploadSuccess(response.GetStatus().GetCode()) {
@@ -143,7 +144,7 @@ func writeUserEventsExample() {
 	opts := defaultOptions(DefaultWriteTimeout)
 	response, err := client.WriteUserEvents(request, opts...)
 	if err != nil {
-		logs.Error("write user event occur err, msg:%s", err.Error())
+		logs.Error("write user event occur err, msg:%v", err)
 		return
 	}
 	if core.IsUploadSuccess(response.GetStatus().GetCode()) {
@@ -175,7 +176,7 @@ func recommendExample() {
 	// The "home" is scene name, which provided by ByteDance, usually is "home"
 	response, err := client.Predict(predictRequest, predictOpts...)
 	if err != nil {
-		logs.Error("predict occur error, msg:%s", err.Error())
+		logs.Error("predict occur error, msg:%v", err)
 		return
 	}
 	if !core.IsSuccess(response.GetStatus().GetCode()) {
@@ -262,7 +263,7 @@ func defaultOptions(timeout time.Duration) []option.Option {
 	// var customerHeaders map[string]string
 	// var customerQueries map[string]string
 	opts := []option.Option{
-		option.WithRequestId(uuid.NewString()),
+		option.WithRequestID(uuid.NewString()),
 		option.WithTimeout(timeout),
 		// Optional. Add a set of customer headers to the request, which will be overwritten by multiple calls.
 		//option.WithHeaders(customerHeaders),

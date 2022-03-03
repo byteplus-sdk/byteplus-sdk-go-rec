@@ -16,11 +16,6 @@ var (
 	writeTooManyErr = errors.New(fmt.Sprintf(writeMsgFormat, maxWriteCount))
 )
 
-const (
-	dataInitOptionCount    = 1
-	predictInitOptionCount = 1
-)
-
 type clientImpl struct {
 	httpClient *core.HTTPClient
 }
@@ -75,35 +70,13 @@ func (c *clientImpl) doWrite(request *protocol.WriteDataRequest,
 	if len(request.GetData()) > maxWriteCount {
 		return nil, writeTooManyErr
 	}
-	if len(opts) == 0 {
-		opts = make([]option.Option, 0, dataInitOptionCount)
-	}
 	response := &protocol.WriteResponse{}
-	opts = addSaasFlag(opts)
-	err := c.httpClient.DoPbRequest(path, request, response, option.Conv2Options(opts...))
+	err := c.httpClient.DoPBRequest(path, request, response, option.Conv2Options(opts...))
 	if err != nil {
 		return nil, err
 	}
 	logs.Debug("[WriteData] rsp:\n%s\n", response)
 	return response, nil
-}
-
-func addSaasFlag(opts []option.Option) []option.Option {
-	return append(opts, withSaasHeader())
-}
-
-func withSaasHeader() option.Option {
-	const (
-		HTTPHeaderServerFrom = "Server-From"
-		SaasFlag             = "saas"
-	)
-	return func(opt *option.Options) {
-		if len(opt.Headers) == 0 {
-			opt.Headers = map[string]string{HTTPHeaderServerFrom: SaasFlag}
-			return
-		}
-		opt.Headers[HTTPHeaderServerFrom] = SaasFlag
-	}
 }
 
 func (c *clientImpl) WriteUsers(writeRequest *protocol.WriteDataRequest,
@@ -126,12 +99,8 @@ func (c *clientImpl) Predict(request *protocol.PredictRequest,
 	if err := checkPredictRequest(request.ProjectId, request.ModelId); err != nil {
 		return nil, err
 	}
-	if len(opts) == 0 {
-		opts = make([]option.Option, 0, predictInitOptionCount)
-	}
 	response := &protocol.PredictResponse{}
-	opts = addSaasFlag(opts)
-	err := c.httpClient.DoPbRequest("/RetailSaaS/Predict",
+	err := c.httpClient.DoPBRequest("/RetailSaaS/Predict",
 		request, response, option.Conv2Options(opts...))
 	if err != nil {
 		return nil, err
@@ -145,12 +114,8 @@ func (c *clientImpl) AckServerImpressions(request *protocol.AckServerImpressions
 	if err := checkPredictRequest(request.ProjectId, request.ModelId); err != nil {
 		return nil, err
 	}
-	if len(opts) == 0 {
-		opts = make([]option.Option, 0, predictInitOptionCount)
-	}
 	response := &protocol.AckServerImpressionsResponse{}
-	opts = addSaasFlag(opts)
-	err := c.httpClient.DoPbRequest("/RetailSaaS/AckServerImpressions",
+	err := c.httpClient.DoPBRequest("/RetailSaaS/AckServerImpressions",
 		request, response, option.Conv2Options(opts...))
 	if err != nil {
 		return nil, err
