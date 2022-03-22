@@ -121,12 +121,13 @@ message Product {
   Price price = 4;
 
   // Required.
-  // True if the product is recommendable (result in `Predict` call).
+  // 1 if the product is recommendable (result in `Predict` call).
+  // 0 if the product isn't recommendable..
   // Note: Any change of this takes up to 1 hour to take effect.
   // Note: Even if a product isn't recommendable, please still send this to us.
   // This is because that users might interact with such products historically,
   // therefore it provides reasonably strong signals.
-  bool is_recommendable = 5;
+  int32 is_recommendable = 5;
 
   // Required.
   // The product title.
