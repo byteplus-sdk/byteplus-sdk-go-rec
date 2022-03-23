@@ -163,7 +163,7 @@ func mockPredictProduct() *protocol.Product {
 		Categories:      []*protocol.Product_Category{category1, category2},
 		Brands:          []*protocol.Product_Brand{brand1, brand2},
 		Price:           price,
-		IsRecommendable: true,
+		IsRecommendable: 1,
 		Title:           "adidas Men's Yeezy Boost 350 V2 Grey/Borang/Dgsogr",
 		QualityScore:    4.4,
 		Tags:            []string{"New Product", "Summer Product"},
