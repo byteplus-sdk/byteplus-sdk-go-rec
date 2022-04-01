@@ -22,6 +22,11 @@ func NewClientBuilder() *clientBuilder {
 	return &clientBuilder{}
 }
 
+func (receiver *clientBuilder) AccountID(accountID string) *clientBuilder {
+	receiver.tenantID = accountID
+	return receiver
+}
+
 func (receiver *clientBuilder) TenantID(tenantID string) *clientBuilder {
 	receiver.tenantID = tenantID
 	return receiver
