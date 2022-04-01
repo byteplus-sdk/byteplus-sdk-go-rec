@@ -42,7 +42,7 @@ func init() {
 	logs.Level = logs.LevelDebug
 	var err error
 	client, err = retail.NewClientBuilder().
-		TenantID("***********"). // Required. The account id of byteplus.
+		AccountID("***********"). // Required. The account id of byteplus.
 		ProjectID(projectID).
 		Region(region.SG).       // Required. The region of the server used to provide service.
 		AuthAK("***********").   // Required. Access Key, used to generate request signature.
