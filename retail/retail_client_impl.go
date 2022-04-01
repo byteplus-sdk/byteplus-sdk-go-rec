@@ -18,6 +18,7 @@ var (
 
 type clientImpl struct {
 	httpClient *core.HTTPClient
+	projectID  string
 }
 
 func (c *clientImpl) Release() {
@@ -64,6 +65,9 @@ func checkUploadDataRequest(projectId string, stage string) error {
 
 func (c *clientImpl) doWrite(request *protocol.WriteDataRequest,
 	path string, opts ...option.Option) (*protocol.WriteResponse, error) {
+	if len(c.projectID) > 0 && len(request.ProjectId) == 0 {
+		request.ProjectId = c.projectID
+	}
 	if err := checkUploadDataRequest(request.ProjectId, request.Stage); err != nil {
 		return nil, err
 	}
@@ -96,6 +100,9 @@ func (c *clientImpl) WriteUserEvents(writeRequest *protocol.WriteDataRequest,
 
 func (c *clientImpl) Predict(request *protocol.PredictRequest,
 	opts ...option.Option) (*protocol.PredictResponse, error) {
+	if len(c.projectID) > 0 && len(request.ProjectId) == 0 {
+		request.ProjectId = c.projectID
+	}
 	if err := checkPredictRequest(request.ProjectId, request.ModelId); err != nil {
 		return nil, err
 	}
@@ -111,6 +118,9 @@ func (c *clientImpl) Predict(request *protocol.PredictRequest,
 
 func (c *clientImpl) AckServerImpressions(request *protocol.AckServerImpressionsRequest,
 	opts ...option.Option) (*protocol.AckServerImpressionsResponse, error) {
+	if len(c.projectID) > 0 && len(request.ProjectId) == 0 {
+		request.ProjectId = c.projectID
+	}
 	if err := checkPredictRequest(request.ProjectId, request.ModelId); err != nil {
 		return nil, err
 	}

@@ -92,6 +92,7 @@ func (receiver *clientBuilder) Build() (Client, error) {
 	}
 	client := &clientImpl{
 		httpClient: httpClient,
+		projectID:  receiver.projectID,
 	}
 	return client, nil
 }
