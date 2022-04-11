@@ -24,6 +24,52 @@ message Status {
   string message = 2;
 }
 
+// Represents a whole or partial calendar date, such as a birthday. The time of
+// day and time zone are either specified elsewhere or are insignificant. The
+// date is relative to the Gregorian Calendar. This can represent one of the
+// following:
+//
+// * A full date, with non-zero year, month, and day values
+// * A month and day value, with a zero year, such as an anniversary
+// * A year on its own, with zero month and day values
+// * A year and month value, with a zero day, such as a credit card expiration
+// date
+message Date {
+  // Year of the date. Must be from 1 to 9999, or 0 to specify a date without
+  // a year.
+  int32 year = 1;
+
+  // Month of a year. Must be from 1 to 12, or 0 to specify a year without a
+  // month and day.
+  int32 month = 2;
+
+  // Day of a month. Must be from 1 to 31 and valid for the year and month, or 0
+  // to specify a year by itself or a year and month where the day isn't
+  // significant.
+  int32 day = 3;
+}
+
+
+message FinishWriteDataRequest{
+  // Required
+  // Id of the recommendation project.
+  string project_id = 1;
+
+  // Required
+  // The stage of importing data，Corresponding to the three synchronization stages of the recommendation platform
+  // Possible type values:
+  // "trial":Test data/pre-synchronization stage
+  // "historical":Historical data synchronization stage
+  // "incremental":Incremental real-time data synchronization stage
+  string stage = 2;
+
+  // Optional.
+  // upload the data that topic of which is not specific
+  string topic = 3;
+
+  repeated Date data_dates = 10;
+}
+
 // The product proto.
 message Product {
   // Required.
@@ -346,6 +392,10 @@ message WriteDataRequest{
   // "incremental":Incremental real-time data synchronization stage
   string stage = 2;
 
+  // Optional.
+  // topic of data
+  string topic = 3;
+
   // Required
   // Array of json strings.
   // Each element of the array is a json serialized string of customer data.
@@ -537,6 +587,14 @@ service BytePlusSaasService {
   rpc WritUsers(WriteDataRequest) returns (WriteResponse);
   rpc WritProducts(WriteDataRequest) returns (WriteResponse);
   rpc WritUserEvents(WriteDataRequest) returns (WriteResponse);
+  // premium only，only saas+service could use this
+  rpc WriteOthers(WriteDataRequest) returns (WriteResponse);
+
+  // Finish
+  //
+  // Pass a date list to mark the completion of data synchronization for these days.
+  // Suitable for new data API
+  rpc Finish(FinishWriteDataRequest) returns (WriteResponse);
 
   // Predict
   //

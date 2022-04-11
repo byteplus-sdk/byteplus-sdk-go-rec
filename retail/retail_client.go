@@ -13,12 +13,22 @@ type Client interface {
 	// One can use this to upload new data, or update existing data.
 	WriteUsers(writeRequest *protocol.WriteDataRequest, opts ...option.Option) (*protocol.WriteResponse, error)
 
+	// FinishWriteUsers
+	//
+	// Recording that user data has been written. Mark at most 2000 dates at a time
+	FinishWriteUsers(request *protocol.FinishWriteDataRequest, opts ...option.Option) (*protocol.WriteResponse, error)
+
 	// WriteProducts
 	//
 	// Writes at most 2000 products data at a time. Exceeding 2000 in a request results in
 	// a rejection.Each element of dataList array is a json serialized string of data.
 	// One can use this to upload new data, or update existing data.
 	WriteProducts(writeRequest *protocol.WriteDataRequest, opts ...option.Option) (*protocol.WriteResponse, error)
+
+	// FinishWriteProducts
+	//
+	// Recording that product data has been written. Mark at most 2000 dates at a time
+	FinishWriteProducts(request *protocol.FinishWriteDataRequest, opts ...option.Option) (*protocol.WriteResponse, error)
 
 	// WriteUserEvents
 	//
@@ -27,6 +37,23 @@ type Client interface {
 	// One can use this to upload new data, or update existing data (by providing all the fields,
 	// some data type not support update, e.g. user event).
 	WriteUserEvents(writeRequest *protocol.WriteDataRequest, opts ...option.Option) (*protocol.WriteResponse, error)
+
+	// FinishWriteUserEvents
+	//
+	// Recording that user event data has been written. Mark at most 2000 dates at a time
+	FinishWriteUserEvents(request *protocol.FinishWriteDataRequest, opts ...option.Option) (*protocol.WriteResponse, error)
+
+	// WriteOthers
+	//
+	// Writes at most 2000 data at a time, the topic of these data is set by users
+	// One can use this to upload new data, or update existing data.
+	WriteOthers(request *protocol.WriteDataRequest, opts ...option.Option) (*protocol.WriteResponse, error)
+
+	// FinishWriteOthers
+	//
+	// Recording that some data has been written, the topic of these data is set by users.
+	// Mark at most 2000 dates at a time
+	FinishWriteOthers(request *protocol.FinishWriteDataRequest, opts ...option.Option) (*protocol.WriteResponse, error)
 
 	// Predict
 	//

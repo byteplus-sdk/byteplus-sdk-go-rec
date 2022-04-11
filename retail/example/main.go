@@ -22,6 +22,8 @@ const (
 
 	DefaultAckImpressionsTimeout = 800 * time.Millisecond
 
+	DefaultFinishTimeout = 800 * time.Millisecond
+
 	DefaultRetryTimes = 2
 )
 
@@ -57,16 +59,31 @@ func init() {
 
 func main() {
 	// Write real-time user data
-	writeUsersExample()
+	//writeUsersExample()
 
-	// Write real-time product data˚
-	writeProductsExample()
+	// Finish write real-time user data
+	finishWriteUsersExample()
+
+	// Write real-time product data
+	//writeProductsExample()
+
+	// Finish write real-time product data
+	finishWriteProductsExample()
 
 	// Write real-time user event data
-	writeUserEventsExample()
+	//writeUserEventsExample()
+
+	// Finish write real-time user event data
+	finishWriteUserEventsExample()
+
+	// Write self defined topic data
+	writeOthersExample()
+
+	// Finish write self defined topic data
+	finishWriteOthersExample()
 
 	// Get recommendation results
-	recommendExample()
+	//recommendExample()
 
 	// Pause for 5 seconds until the asynchronous import task completes
 	time.Sleep(5 * time.Second)
@@ -106,6 +123,49 @@ func buildWriteUsersRequest(count int) *protocol.WriteDataRequest {
 	}
 }
 
+func finishWriteUsersExample() {
+	request := buildFinishRequest(retail.TopicUser)
+	opts := defaultOptions(DefaultFinishTimeout)
+	response, err := client.FinishWriteUsers(request, opts...)
+	if err != nil {
+		logs.Error("run finish occur error, msg:%v", err)
+		return
+	}
+	if core.IsUploadSuccess(response.GetStatus().GetCode()) {
+		logs.Info("finish write user data")
+		return
+	}
+	logs.Error("fail to finish write user data, msg:%s errItems:%+v",
+		response.GetStatus(), response.GetErrors())
+}
+
+func buildFinishRequest(topic string) *protocol.FinishWriteDataRequest {
+	dateList := []time.Time{
+		time.Date(2022, 3, 1, 0, 0, 0, 0, time.UTC),
+	}
+	var dates []*protocol.Date
+	// finish user or product do not need to write dates
+	if retail.TopicUser != topic && retail.TopicProduct != topic {
+		for _, date := range dateList {
+			dates = appendDoneDate(dates, date)
+		}
+	}
+	return &protocol.FinishWriteDataRequest{
+		ProjectId: projectID,
+		Stage:     retail.StageIncrementalDaily,
+		Topic:     topic,
+		DataDates: dates,
+	}
+}
+
+func appendDoneDate(dates []*protocol.Date, date time.Time) []*protocol.Date {
+	return append(dates, &protocol.Date{
+		Year:  int32(date.Year()),
+		Month: int32(date.Month()),
+		Day:   int32(date.Day()),
+	})
+}
+
 func writeProductsExample() {
 	// The "WriteXXX" api can transfer max to 2000 items at one request
 	request := buildWriteProductsRequest(1)
@@ -138,6 +198,22 @@ func buildWriteProductsRequest(count int) *protocol.WriteDataRequest {
 	}
 }
 
+func finishWriteProductsExample() {
+	request := buildFinishRequest(retail.TopicProduct)
+	opts := defaultOptions(DefaultFinishTimeout)
+	response, err := client.FinishWriteProducts(request, opts...)
+	if err != nil {
+		logs.Error("run finish occur error, msg:%v", err)
+		return
+	}
+	if core.IsUploadSuccess(response.GetStatus().GetCode()) {
+		logs.Info("finish write product data")
+		return
+	}
+	logs.Error("fail to finish write product data, msg:%s errItems:%+v",
+		response.GetStatus(), response.GetErrors())
+}
+
 func writeUserEventsExample() {
 	// The "WriteXXX" api can transfer max to 2000 items at one request
 	request := buildWriteUserEventsRequest(1)
@@ -168,6 +244,71 @@ func buildWriteUserEventsRequest(count int) *protocol.WriteDataRequest {
 		Data:      marshalUserEvents,
 		Extra:     map[string]string{"extra_info": "extra"},
 	}
+}
+
+func finishWriteUserEventsExample() {
+	request := buildFinishRequest(retail.TopicUserEvent)
+	opts := defaultOptions(DefaultFinishTimeout)
+	response, err := client.FinishWriteUserEvents(request, opts...)
+	if err != nil {
+		logs.Error("run finish occur error, msg:%v", err)
+		return
+	}
+	if core.IsUploadSuccess(response.GetStatus().GetCode()) {
+		logs.Info("finish user event product data")
+		return
+	}
+	logs.Error("fail to finish write user event data, msg:%s errItems:%+v",
+		response.GetStatus(), response.GetErrors())
+}
+
+func writeOthersExample() {
+	// The "WriteXXX" api can transfer max to 2000 items at one request
+	// The `topic` is some enums provided by bytedance,
+	// who according to tenant's situation
+	topic := retail.TopicUser
+	request := buildWriteOthersRequest(1, topic)
+	opts := defaultOptions(DefaultWriteTimeout)
+	response, err := client.WriteUserEvents(request, opts...)
+	if err != nil {
+		logs.Error("write user event occur err, msg:%v", err)
+		return
+	}
+	if core.IsUploadSuccess(response.GetStatus().GetCode()) {
+		logs.Info("write user event success")
+		return
+	}
+	logs.Error("write user event find failure info, msg:%s errItems:%+v",
+		response.GetStatus(), response.GetErrors())
+}
+
+func buildWriteOthersRequest(count int, topic string) *protocol.WriteDataRequest {
+	switch topic {
+	case retail.TopicUser:
+		return buildWriteUsersRequest(count)
+	case retail.TopicProduct:
+		return buildWriteProductsRequest(count)
+	default:
+		return buildWriteUserEventsRequest(count)
+		// TODO 后期增加了具体writeOthers的topic以及request内容,再在这里修改
+	}
+}
+
+func finishWriteOthersExample() {
+	topic := retail.TopicUser
+	request := buildFinishRequest(topic)
+	opts := defaultOptions(DefaultFinishTimeout)
+	response, err := client.FinishWriteUserEvents(request, opts...)
+	if err != nil {
+		logs.Error("run finish occur error, msg:%v", err)
+		return
+	}
+	if core.IsUploadSuccess(response.GetStatus().GetCode()) {
+		logs.Info("finish writing data")
+		return
+	}
+	logs.Error("fail to finish write data, msg:%s errItems:%+v",
+		response.GetStatus(), response.GetErrors())
 }
 
 func recommendExample() {
