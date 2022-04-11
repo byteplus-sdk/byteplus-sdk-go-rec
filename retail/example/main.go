@@ -59,19 +59,19 @@ func init() {
 
 func main() {
 	// Write real-time user data
-	//writeUsersExample()
+	writeUsersExample()
 
 	// Finish write real-time user data
 	finishWriteUsersExample()
 
 	// Write real-time product data
-	//writeProductsExample()
+	writeProductsExample()
 
 	// Finish write real-time product data
 	finishWriteProductsExample()
 
 	// Write real-time user event data
-	//writeUserEventsExample()
+	writeUserEventsExample()
 
 	// Finish write real-time user event data
 	finishWriteUserEventsExample()
@@ -83,7 +83,7 @@ func main() {
 	finishWriteOthersExample()
 
 	// Get recommendation results
-	//recommendExample()
+	recommendExample()
 
 	// Pause for 5 seconds until the asynchronous import task completes
 	time.Sleep(5 * time.Second)
@@ -147,7 +147,7 @@ func buildFinishRequest(topic string) *protocol.FinishWriteDataRequest {
 	// finish user or product do not need to write dates
 	if retail.TopicUser != topic && retail.TopicProduct != topic {
 		for _, date := range dateList {
-			dates = appendDoneDate(dates, date)
+			dates = appendFinishDate(dates, date)
 		}
 	}
 	return &protocol.FinishWriteDataRequest{
@@ -158,7 +158,7 @@ func buildFinishRequest(topic string) *protocol.FinishWriteDataRequest {
 	}
 }
 
-func appendDoneDate(dates []*protocol.Date, date time.Time) []*protocol.Date {
+func appendFinishDate(dates []*protocol.Date, date time.Time) []*protocol.Date {
 	return append(dates, &protocol.Date{
 		Year:  int32(date.Year()),
 		Month: int32(date.Month()),
