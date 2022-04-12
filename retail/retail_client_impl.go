@@ -3,7 +3,6 @@ package retail
 import (
 	"errors"
 	"fmt"
-	"strings"
 
 	core "github.com/byteplus-sdk/byteplus-sdk-go-rec-core"
 	"github.com/byteplus-sdk/byteplus-sdk-go-rec-core/logs"
@@ -26,45 +25,17 @@ func (c *clientImpl) Release() {
 	c.httpClient.Shutdown()
 }
 
-func checkPredictRequest(projectId string, modelId string) error {
-	const (
-		errMsgFormat      = "%s field can't be empty"
-		errFieldProjectId = "projectId"
-		errFieldModelId   = "modelId"
-	)
-	if projectId != "" && modelId != "" {
-		return nil
-	}
-	emptyParams := make([]string, 0)
-	if projectId == "" {
-		emptyParams = append(emptyParams, errFieldProjectId)
-	}
-	if modelId == "" {
-		emptyParams = append(emptyParams, errFieldModelId)
-	}
-	return errors.New(fmt.Sprintf(errMsgFormat, strings.Join(emptyParams, ",")))
-}
-
 func checkWriteDataRequest(request *protocol.WriteDataRequest) error {
-	const (
-		errMsgFormat      = "%s field can't' be empty"
-		errFieldProjectId = "projectId"
-		errFieldStage     = "stage"
-	)
+	if request.GetProjectId() == "" {
+		return errors.New("project id is empty")
+	}
+	if request.GetStage() == "" {
+		return errors.New("stage is empty")
+	}
 	if len(request.GetData()) > maxWriteCount {
 		return writeTooManyErr
 	}
-	if request.GetProjectId() != "" && request.GetStage() != "" {
-		return nil
-	}
-	emptyParams := make([]string, 0)
-	if request.GetProjectId() == "" {
-		emptyParams = append(emptyParams, errFieldProjectId)
-	}
-	if request.GetStage() == "" {
-		emptyParams = append(emptyParams, errFieldStage)
-	}
-	return errors.New(fmt.Sprintf(errMsgFormat, strings.Join(emptyParams, ",")))
+	return nil
 }
 
 func (c *clientImpl) doWrite(request *protocol.WriteDataRequest,
@@ -108,29 +79,19 @@ func (c *clientImpl) WriteOthers(writeRequest *protocol.WriteDataRequest,
 }
 
 func checkFinishDataRequest(request *protocol.FinishWriteDataRequest) error {
-	const (
-		errMsgFormat      = "%s field can't' be empty"
-		errFieldProjectId = "projectId"
-		errFieldStage     = "stage"
-		errFieldTopic     = "topic"
-	)
+	if request.GetProjectId() == "" {
+		return errors.New("project id is empty")
+	}
+	if request.GetStage() == "" {
+		return errors.New("stage is empty")
+	}
+	if request.GetTopic() == "" {
+		return errors.New("topic is empty")
+	}
 	if len(request.GetDataDates()) > maxFinishCount {
 		return finishTooManyErr
 	}
-	if request.GetProjectId() != "" && request.GetStage() != "" && request.GetTopic() != "" {
-		return nil
-	}
-	emptyParams := make([]string, 0)
-	if request.GetProjectId() == "" {
-		emptyParams = append(emptyParams, errFieldProjectId)
-	}
-	if request.GetStage() == "" {
-		emptyParams = append(emptyParams, errFieldStage)
-	}
-	if request.GetTopic() == "" {
-		emptyParams = append(emptyParams, errFieldTopic)
-	}
-	return errors.New(fmt.Sprintf(errMsgFormat, strings.Join(emptyParams, ",")))
+	return nil
 }
 
 func (c *clientImpl) doFinish(request *protocol.FinishWriteDataRequest,
@@ -171,6 +132,16 @@ func (c *clientImpl) FinishWriteUserEvents(finishRequest *protocol.FinishWriteDa
 func (c *clientImpl) FinishWriteOthers(finishRequest *protocol.FinishWriteDataRequest,
 	opts ...option.Option) (*protocol.WriteResponse, error) {
 	return c.doFinish(finishRequest, FinishOthersUri, opts...)
+}
+
+func checkPredictRequest(projectId string, modelId string) error {
+	if projectId == "" {
+		return errors.New("project id is empty")
+	}
+	if modelId == "" {
+		return errors.New("model id is empty")
+	}
+	return nil
 }
 
 func (c *clientImpl) Predict(request *protocol.PredictRequest,
