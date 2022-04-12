@@ -186,8 +186,16 @@ type FinishWriteDataRequest struct {
 	// "incremental":Incremental real-time data synchronization stage
 	Stage string `protobuf:"bytes,2,opt,name=stage,proto3" json:"stage,omitempty"`
 	// Optional.
-	// upload the data that topic of which is not specific
-	Topic     string  `protobuf:"bytes,3,opt,name=topic,proto3" json:"topic,omitempty"`
+	// topic is datatype, which specify the type of data users are going to write.
+	// in WriteOthers, topic should not be missing in request, In other cases, the topic can be omitted.
+	// The acceptable values are "user", "goods", "behavior", and "others"
+	// user: user data
+	// goods: product data
+	// behavior: user event data
+	// others: It is temporarily set to "others", the specific value depends on your need.
+	Topic string `protobuf:"bytes,3,opt,name=topic,proto3" json:"topic,omitempty"`
+	// Optional.
+	// When finish user events, data_dates should not be missing
 	DataDates []*Date `protobuf:"bytes,10,rep,name=data_dates,json=dataDates,proto3" json:"data_dates,omitempty"`
 }
 
@@ -811,7 +819,13 @@ type WriteDataRequest struct {
 	// "incremental":Incremental real-time data synchronization stage
 	Stage string `protobuf:"bytes,2,opt,name=stage,proto3" json:"stage,omitempty"`
 	// Optional.
-	// topic of data
+	// topic is datatype, which specify the type of data users are going to write.
+	// in WriteOthers, topic should not be missing in request, In other cases, the topic can be omitted.
+	// The acceptable values are "user", "goods", "behavior", and "others"
+	// user: user data
+	// goods: product data
+	// behavior: user event data
+	// others: It is temporarily set to "others", the specific value depends on your need.
 	Topic string `protobuf:"bytes,3,opt,name=topic,proto3" json:"topic,omitempty"`
 	// Required
 	// Array of json strings.

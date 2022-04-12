@@ -46,9 +46,9 @@ func init() {
 	client, err = retail.NewClientBuilder().
 		AccountID("***********"). // Required. The account id of byteplus.
 		ProjectID(projectID).
-		Region(region.SG).       // Required. The region of the server used to provide service.
-		AuthAK("***********").   // Required. Access Key, used to generate request signature.
-		AuthSK("***********=="). // Required. Secure key, used to generate request signature.
+		Region(region.SG).     // Required. The region of the server used to provide service.
+		AuthAK("***********"). // Required. Access Key, used to generate request signature.
+		AuthSK("***********"). // Required. Secure key, used to generate request signature.
 		//Schema("https"). // Optional.
 		//Hosts([]string{"rec-api-sg1.recplusapi.com"}). // Optional.
 		Build()
@@ -62,25 +62,25 @@ func main() {
 	writeUsersExample()
 
 	// Finish write real-time user data
-	finishWriteUsersExample()
+	//finishWriteUsersExample()
 
 	// Write real-time product data
 	writeProductsExample()
 
 	// Finish write real-time product data
-	finishWriteProductsExample()
+	//finishWriteProductsExample()
 
 	// Write real-time user event data
 	writeUserEventsExample()
 
 	// Finish write real-time user event data
-	finishWriteUserEventsExample()
+	//finishWriteUserEventsExample()
 
 	// Write self defined topic data
-	writeOthersExample()
+	//writeOthersExample()
 
 	// Finish write self defined topic data
-	finishWriteOthersExample()
+	//finishWriteOthersExample()
 
 	// Get recommendation results
 	recommendExample()
@@ -116,15 +116,14 @@ func buildWriteUsersRequest(count int) *protocol.WriteDataRequest {
 		marshalUsers = append(marshalUsers, string(marshalUser))
 	}
 	return &protocol.WriteDataRequest{
-		ProjectId: projectID,
-		Stage:     retail.StageTrial,
-		Data:      marshalUsers,
-		Extra:     map[string]string{"extra_info": "extra"},
+		Stage: retail.StageTrial,
+		Data:  marshalUsers,
+		Extra: map[string]string{"extra_info": "extra"},
 	}
 }
 
 func finishWriteUsersExample() {
-	request := buildFinishRequest(retail.TopicUser)
+	request := buildFinishUserRequest()
 	opts := defaultOptions(DefaultFinishTimeout)
 	response, err := client.FinishWriteUsers(request, opts...)
 	if err != nil {
@@ -139,31 +138,10 @@ func finishWriteUsersExample() {
 		response.GetStatus(), response.GetErrors())
 }
 
-func buildFinishRequest(topic string) *protocol.FinishWriteDataRequest {
-	dateList := []time.Time{
-		time.Date(2022, 3, 1, 0, 0, 0, 0, time.UTC),
-	}
-	var dates []*protocol.Date
-	// finish user or product do not need to write dates
-	if retail.TopicUser != topic && retail.TopicProduct != topic {
-		for _, date := range dateList {
-			dates = appendFinishDate(dates, date)
-		}
-	}
+func buildFinishUserRequest() *protocol.FinishWriteDataRequest {
 	return &protocol.FinishWriteDataRequest{
-		ProjectId: projectID,
-		Stage:     retail.StageIncrementalDaily,
-		Topic:     topic,
-		DataDates: dates,
+		Stage: retail.StageIncrementalDaily,
 	}
-}
-
-func appendFinishDate(dates []*protocol.Date, date time.Time) []*protocol.Date {
-	return append(dates, &protocol.Date{
-		Year:  int32(date.Year()),
-		Month: int32(date.Month()),
-		Day:   int32(date.Day()),
-	})
 }
 
 func writeProductsExample() {
@@ -191,15 +169,15 @@ func buildWriteProductsRequest(count int) *protocol.WriteDataRequest {
 		marshalProducts = append(marshalProducts, string(marshalProduct))
 	}
 	return &protocol.WriteDataRequest{
-		ProjectId: projectID,
-		Stage:     retail.StageTrial,
-		Data:      marshalProducts,
-		Extra:     map[string]string{"extra_info": "extra"},
+		Stage: retail.StageTrial,
+		Data:  marshalProducts,
+		Extra: map[string]string{"extra_info": "extra"},
 	}
 }
 
 func finishWriteProductsExample() {
-	request := buildFinishRequest(retail.TopicProduct)
+	// The "FinishXXX" api can mark max to 100 dates at one request
+	request := buildFinishProductRequest()
 	opts := defaultOptions(DefaultFinishTimeout)
 	response, err := client.FinishWriteProducts(request, opts...)
 	if err != nil {
@@ -212,6 +190,12 @@ func finishWriteProductsExample() {
 	}
 	logs.Error("fail to finish write product data, msg:%s errItems:%+v",
 		response.GetStatus(), response.GetErrors())
+}
+
+func buildFinishProductRequest() *protocol.FinishWriteDataRequest {
+	return &protocol.FinishWriteDataRequest{
+		Stage: retail.StageIncrementalDaily,
+	}
 }
 
 func writeUserEventsExample() {
@@ -239,15 +223,15 @@ func buildWriteUserEventsRequest(count int) *protocol.WriteDataRequest {
 		marshalUserEvents = append(marshalUserEvents, string(marshalUserEvent))
 	}
 	return &protocol.WriteDataRequest{
-		ProjectId: projectID,
-		Stage:     retail.StageTrial,
-		Data:      marshalUserEvents,
-		Extra:     map[string]string{"extra_info": "extra"},
+		Stage: retail.StageTrial,
+		Data:  marshalUserEvents,
+		Extra: map[string]string{"extra_info": "extra"},
 	}
 }
 
 func finishWriteUserEventsExample() {
-	request := buildFinishRequest(retail.TopicUserEvent)
+	// The "FinishXXX" api can mark max to 100 dates at one request
+	request := buildFinishUserEventRequest()
 	opts := defaultOptions(DefaultFinishTimeout)
 	response, err := client.FinishWriteUserEvents(request, opts...)
 	if err != nil {
@@ -262,43 +246,63 @@ func finishWriteUserEventsExample() {
 		response.GetStatus(), response.GetErrors())
 }
 
+func buildFinishUserEventRequest() *protocol.FinishWriteDataRequest {
+	// dates should be passed when finishing others
+	dates := []*protocol.Date{
+		{
+			Year:  2022,
+			Month: 2,
+			Day:   1,
+		}}
+	return &protocol.FinishWriteDataRequest{
+		Stage:     retail.StageIncrementalDaily,
+		DataDates: dates,
+	}
+}
+
 func writeOthersExample() {
 	// The "WriteXXX" api can transfer max to 2000 items at one request
-	// The `topic` is some enums provided by bytedance,
-	// who according to tenant's situation
-	topic := retail.TopicUser
-	request := buildWriteOthersRequest(1, topic)
+	// The `topic` is datatype, which specify the type of data users are going to write.
+	// It is temporarily set to "video", the specific value depends on your need.
+	topic := "video"
+	request := buildWriteOthersRequest(topic)
 	opts := defaultOptions(DefaultWriteTimeout)
-	response, err := client.WriteUserEvents(request, opts...)
+	response, err := client.WriteOthers(request, opts...)
 	if err != nil {
-		logs.Error("write user event occur err, msg:%v", err)
+		logs.Error("write others occur err, msg:%v", err)
 		return
 	}
 	if core.IsUploadSuccess(response.GetStatus().GetCode()) {
-		logs.Info("write user event success")
+		logs.Info("write others success")
 		return
 	}
-	logs.Error("write user event find failure info, msg:%s errItems:%+v",
+	logs.Error("write others find failure info, msg:%s errItems:%+v",
 		response.GetStatus(), response.GetErrors())
 }
 
-func buildWriteOthersRequest(count int, topic string) *protocol.WriteDataRequest {
-	switch topic {
-	case retail.TopicUser:
-		return buildWriteUsersRequest(count)
-	case retail.TopicProduct:
-		return buildWriteProductsRequest(count)
-	default:
-		return buildWriteUserEventsRequest(count)
-		// TODO 后期增加了具体writeOthers的topic以及request内容,再在这里修改
+func buildWriteOthersRequest(topic string) *protocol.WriteDataRequest {
+	data := map[string]interface{}{
+		"field1": 1,
+		"field2": "value2",
+	}
+	marshalData, _ := json.Marshal(data)
+	datas := []string{string(marshalData)}
+	return &protocol.WriteDataRequest{
+		Stage: retail.StageTrial,
+		Topic: topic,
+		Data:  datas,
+		Extra: map[string]string{"extra_info": "extra"},
 	}
 }
 
 func finishWriteOthersExample() {
-	topic := retail.TopicUser
-	request := buildFinishRequest(topic)
+	// The "FinishXXX" api can mark max to 100 dates at one request
+	// The `topic` is datatype, which specify the type of data users are going to finish writing.
+	// It is temporarily set to "video", the specific value depends on your need.
+	topic := "video"
+	request := buildFinishOthersRequest(topic)
 	opts := defaultOptions(DefaultFinishTimeout)
-	response, err := client.FinishWriteUserEvents(request, opts...)
+	response, err := client.FinishWriteOthers(request, opts...)
 	if err != nil {
 		logs.Error("run finish occur error, msg:%v", err)
 		return
@@ -309,6 +313,21 @@ func finishWriteOthersExample() {
 	}
 	logs.Error("fail to finish write data, msg:%s errItems:%+v",
 		response.GetStatus(), response.GetErrors())
+}
+
+func buildFinishOthersRequest(topic string) *protocol.FinishWriteDataRequest {
+	// dates should be passed when finishing others
+	dates := []*protocol.Date{
+		{
+			Year:  2022,
+			Month: 1,
+			Day:   1,
+		}}
+	return &protocol.FinishWriteDataRequest{
+		Stage:     retail.StageIncrementalDaily,
+		DataDates: dates,
+		Topic:     topic,
+	}
 }
 
 func recommendExample() {
@@ -351,12 +370,11 @@ func buildPredictRequest() *protocol.PredictRequest {
 		CandidateProductIds: []string{"632462", "632463"},
 	}
 	return &protocol.PredictRequest{
-		ProjectId: projectID,
-		ModelId:   modelID,
-		UserId:    "1457789",
-		Size:      20,
-		Scene:     scene,
-		Context:   context,
+		ModelId: modelID,
+		UserId:  "1457789",
+		Size:    20,
+		Scene:   scene,
+		Context: context,
 		// Extra:     map[string]string{"extra_info": "extra"},
 	}
 }
@@ -390,7 +408,6 @@ func buildAckRequest(predictRequestId string, predictRequest *protocol.PredictRe
 	alteredProducts []*protocol.AckServerImpressionsRequest_AlteredProduct) *protocol.AckServerImpressionsRequest {
 
 	return &protocol.AckServerImpressionsRequest{
-		ProjectId:        predictRequest.GetProjectId(),
 		ModelId:          predictRequest.GetModelId(),
 		PredictRequestId: predictRequestId,
 		UserId:           predictRequest.GetUserId(),

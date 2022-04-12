@@ -1,7 +1,8 @@
 package retail
 
 const (
-	maxWriteCount = 2000
+	maxWriteCount  = 2000
+	maxFinishCount = 100
 )
 
 const (

@@ -12,8 +12,9 @@ import (
 )
 
 var (
-	writeMsgFormat  = "Only can receive max to %d items in one write request"
-	writeTooManyErr = errors.New(fmt.Sprintf(writeMsgFormat, maxWriteCount))
+	writeMsgFormat   = "Only can receive max to %d items in one request"
+	writeTooManyErr  = errors.New(fmt.Sprintf(writeMsgFormat, maxWriteCount))
+	finishTooManyErr = errors.New(fmt.Sprintf(writeMsgFormat, maxFinishCount))
 )
 
 type clientImpl struct {
@@ -44,12 +45,15 @@ func checkPredictRequest(projectId string, modelId string) error {
 	return errors.New(fmt.Sprintf(errMsgFormat, strings.Join(emptyParams, ",")))
 }
 
-func checkUploadDataRequest(request *protocol.WriteDataRequest) error {
+func checkWriteDataRequest(request *protocol.WriteDataRequest) error {
 	const (
 		errMsgFormat      = "%s field can't' be empty"
 		errFieldProjectId = "projectId"
 		errFieldStage     = "stage"
 	)
+	if len(request.GetData()) > maxWriteCount {
+		return writeTooManyErr
+	}
 	if request.GetProjectId() != "" && request.GetStage() != "" {
 		return nil
 	}
@@ -68,11 +72,8 @@ func (c *clientImpl) doWrite(request *protocol.WriteDataRequest,
 	if len(c.projectID) > 0 && len(request.ProjectId) == 0 {
 		request.ProjectId = c.projectID
 	}
-	if err := checkUploadDataRequest(request); err != nil {
+	if err := checkWriteDataRequest(request); err != nil {
 		return nil, err
-	}
-	if len(request.GetData()) > maxWriteCount {
-		return nil, writeTooManyErr
 	}
 	response := &protocol.WriteResponse{}
 	err := c.httpClient.DoPBRequest(path, request, response, option.Conv2Options(opts...))
@@ -85,16 +86,19 @@ func (c *clientImpl) doWrite(request *protocol.WriteDataRequest,
 
 func (c *clientImpl) WriteUsers(writeRequest *protocol.WriteDataRequest,
 	opts ...option.Option) (*protocol.WriteResponse, error) {
+	writeRequest.Topic = TopicUser
 	return c.doWrite(writeRequest, UserUri, opts...)
 }
 
 func (c *clientImpl) WriteProducts(writeRequest *protocol.WriteDataRequest,
 	opts ...option.Option) (*protocol.WriteResponse, error) {
+	writeRequest.Topic = TopicProduct
 	return c.doWrite(writeRequest, ProductUri, opts...)
 }
 
 func (c *clientImpl) WriteUserEvents(writeRequest *protocol.WriteDataRequest,
 	opts ...option.Option) (*protocol.WriteResponse, error) {
+	writeRequest.Topic = TopicUserEvent
 	return c.doWrite(writeRequest, UserEventUri, opts...)
 }
 
@@ -110,6 +114,9 @@ func checkFinishDataRequest(request *protocol.FinishWriteDataRequest) error {
 		errFieldStage     = "stage"
 		errFieldTopic     = "topic"
 	)
+	if len(request.GetDataDates()) > maxFinishCount {
+		return finishTooManyErr
+	}
 	if request.GetProjectId() != "" && request.GetStage() != "" && request.GetTopic() != "" {
 		return nil
 	}
@@ -134,9 +141,6 @@ func (c *clientImpl) doFinish(request *protocol.FinishWriteDataRequest,
 	if err := checkFinishDataRequest(request); err != nil {
 		return nil, err
 	}
-	if len(request.GetDataDates()) > maxWriteCount {
-		return nil, writeTooManyErr
-	}
 	response := &protocol.WriteResponse{}
 	err := c.httpClient.DoPBRequest(path, request, response, option.Conv2Options(opts...))
 	if err != nil {
@@ -148,16 +152,19 @@ func (c *clientImpl) doFinish(request *protocol.FinishWriteDataRequest,
 
 func (c *clientImpl) FinishWriteUsers(finishRequest *protocol.FinishWriteDataRequest,
 	opts ...option.Option) (*protocol.WriteResponse, error) {
+	finishRequest.Topic = TopicUser
 	return c.doFinish(finishRequest, FinishUserUri, opts...)
 }
 
 func (c *clientImpl) FinishWriteProducts(finishRequest *protocol.FinishWriteDataRequest,
 	opts ...option.Option) (*protocol.WriteResponse, error) {
+	finishRequest.Topic = TopicProduct
 	return c.doFinish(finishRequest, FinishProductUri, opts...)
 }
 
 func (c *clientImpl) FinishWriteUserEvents(finishRequest *protocol.FinishWriteDataRequest,
 	opts ...option.Option) (*protocol.WriteResponse, error) {
+	finishRequest.Topic = TopicUserEvent
 	return c.doFinish(finishRequest, FinishUserEventUri, opts...)
 }
 
@@ -175,8 +182,7 @@ func (c *clientImpl) Predict(request *protocol.PredictRequest,
 		return nil, err
 	}
 	response := &protocol.PredictResponse{}
-	err := c.httpClient.DoPBRequest(PredictUri,
-		request, response, option.Conv2Options(opts...))
+	err := c.httpClient.DoPBRequest(PredictUri, request, response, option.Conv2Options(opts...))
 	if err != nil {
 		return nil, err
 	}

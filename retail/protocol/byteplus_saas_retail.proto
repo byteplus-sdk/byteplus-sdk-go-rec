@@ -64,9 +64,17 @@ message FinishWriteDataRequest{
   string stage = 2;
 
   // Optional.
-  // upload the data that topic of which is not specific
+  // topic is datatype, which specify the type of data users are going to write.
+  // in WriteOthers, topic should not be missing in request, In other cases, the topic can be omitted.
+  // The acceptable values are "user", "goods", "behavior", and "others"
+  // user: user data
+  // goods: product data
+  // behavior: user event data
+  // others: It is temporarily set to "others", the specific value depends on your need.
   string topic = 3;
 
+  // Optional.
+  // When finish user events, data_dates should not be missing
   repeated Date data_dates = 10;
 }
 
@@ -393,7 +401,13 @@ message WriteDataRequest{
   string stage = 2;
 
   // Optional.
-  // topic of data
+  // topic is datatype, which specify the type of data users are going to write.
+  // in WriteOthers, topic should not be missing in request, In other cases, the topic can be omitted.
+  // The acceptable values are "user", "goods", "behavior", and "others"
+  // user: user data
+  // goods: product data
+  // behavior: user event data
+  // others: It is temporarily set to "others", the specific value depends on your need.
   string topic = 3;
 
   // Required
@@ -587,13 +601,13 @@ service BytePlusSaasService {
   rpc WritUsers(WriteDataRequest) returns (WriteResponse);
   rpc WritProducts(WriteDataRequest) returns (WriteResponse);
   rpc WritUserEvents(WriteDataRequest) returns (WriteResponse);
-  // premium only，only saas+service could use this
+  // Byteplus Recommend premium only. Upload and write additional data to Byteplus Recommend.
   rpc WriteOthers(WriteDataRequest) returns (WriteResponse);
 
   // Finish
   //
-  // Pass a date list to mark the completion of data synchronization for these days.
-  // Suitable for new data API
+  // Finish a certain data transfer process. Finish at most 100 data at a time.
+  // May pass a date list to mark the completion of data synchronization for these days.
   rpc Finish(FinishWriteDataRequest) returns (WriteResponse);
 
   // Predict

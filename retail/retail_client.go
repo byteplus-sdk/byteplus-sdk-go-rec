@@ -15,7 +15,8 @@ type Client interface {
 
 	// FinishWriteUsers
 	//
-	// Recording that user data has been written. Mark at most 2000 dates at a time
+	// Recording that user data has been written. Mark at most 100 dates at a time
+	// No need to finish real-time data, the system will automatically finish when entering the next day
 	FinishWriteUsers(request *protocol.FinishWriteDataRequest, opts ...option.Option) (*protocol.WriteResponse, error)
 
 	// WriteProducts
@@ -27,7 +28,8 @@ type Client interface {
 
 	// FinishWriteProducts
 	//
-	// Recording that product data has been written. Mark at most 2000 dates at a time
+	// Recording that product data has been written. Mark at most 100 dates at a time
+	// No need to finish real-time data, the system will automatically finish when entering the next day
 	FinishWriteProducts(request *protocol.FinishWriteDataRequest, opts ...option.Option) (*protocol.WriteResponse, error)
 
 	// WriteUserEvents
@@ -40,7 +42,10 @@ type Client interface {
 
 	// FinishWriteUserEvents
 	//
-	// Recording that user event data has been written. Mark at most 2000 dates at a time
+	// Recording that user event data has been written. Mark at most 100 dates at a time
+	// In general, you need to pass the date list in FinishWriteDataRequest. While if the date list is empty,
+	// the data of the previous day will be finished by default.
+	// No need to finish real-time data, the system will automatically finish when entering the next day
 	FinishWriteUserEvents(request *protocol.FinishWriteDataRequest, opts ...option.Option) (*protocol.WriteResponse, error)
 
 	// WriteOthers
@@ -52,7 +57,8 @@ type Client interface {
 	// FinishWriteOthers
 	//
 	// Recording that some data has been written, the topic of these data is set by users.
-	// Mark at most 2000 dates at a time
+	// Mark at most 100 dates at a time
+	// No need to finish real-time data, the system will automatically finish when entering the next day
 	FinishWriteOthers(request *protocol.FinishWriteDataRequest, opts ...option.Option) (*protocol.WriteResponse, error)
 
 	// Predict
