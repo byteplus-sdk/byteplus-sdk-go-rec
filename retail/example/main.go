@@ -22,6 +22,8 @@ const (
 
 	DefaultAckImpressionsTimeout = 800 * time.Millisecond
 
+	DefaultFinishTimeout = 800 * time.Millisecond
+
 	DefaultRetryTimes = 2
 )
 
@@ -44,9 +46,9 @@ func init() {
 	client, err = retail.NewClientBuilder().
 		AccountID("***********"). // Required. The account id of byteplus.
 		ProjectID(projectID).
-		Region(region.SG).       // Required. The region of the server used to provide service.
-		AuthAK("***********").   // Required. Access Key, used to generate request signature.
-		AuthSK("***********=="). // Required. Secure key, used to generate request signature.
+		Region(region.SG).     // Required. The region of the server used to provide service.
+		AuthAK("***********"). // Required. Access Key, used to generate request signature.
+		AuthSK("***********"). // Required. Secure key, used to generate request signature.
 		//Schema("https"). // Optional.
 		//Hosts([]string{"rec-api-sg1.recplusapi.com"}). // Optional.
 		Build()
@@ -59,11 +61,26 @@ func main() {
 	// Write real-time user data
 	writeUsersExample()
 
-	// Write real-time product data˚
+	// Finish write real-time user data
+	//finishWriteUsersExample()
+
+	// Write real-time product data
 	writeProductsExample()
+
+	// Finish write real-time product data
+	//finishWriteProductsExample()
 
 	// Write real-time user event data
 	writeUserEventsExample()
+
+	// Finish write real-time user event data
+	//finishWriteUserEventsExample()
+
+	// Write self defined topic data
+	//writeOthersExample()
+
+	// Finish write self defined topic data
+	//finishWriteOthersExample()
 
 	// Get recommendation results
 	recommendExample()
@@ -99,10 +116,31 @@ func buildWriteUsersRequest(count int) *protocol.WriteDataRequest {
 		marshalUsers = append(marshalUsers, string(marshalUser))
 	}
 	return &protocol.WriteDataRequest{
-		ProjectId: projectID,
-		Stage:     retail.StageTrial,
-		Data:      marshalUsers,
-		Extra:     map[string]string{"extra_info": "extra"},
+		Stage: retail.StageTrial,
+		Data:  marshalUsers,
+		Extra: map[string]string{"extra_info": "extra"},
+	}
+}
+
+func finishWriteUsersExample() {
+	request := buildFinishUserRequest()
+	opts := defaultOptions(DefaultFinishTimeout)
+	response, err := client.FinishWriteUsers(request, opts...)
+	if err != nil {
+		logs.Error("run finish occur error, msg:%v", err)
+		return
+	}
+	if core.IsUploadSuccess(response.GetStatus().GetCode()) {
+		logs.Info("finish write user data")
+		return
+	}
+	logs.Error("fail to finish write user data, msg:%s errItems:%+v",
+		response.GetStatus(), response.GetErrors())
+}
+
+func buildFinishUserRequest() *protocol.FinishWriteDataRequest {
+	return &protocol.FinishWriteDataRequest{
+		Stage: retail.StageIncrementalDaily,
 	}
 }
 
@@ -131,10 +169,32 @@ func buildWriteProductsRequest(count int) *protocol.WriteDataRequest {
 		marshalProducts = append(marshalProducts, string(marshalProduct))
 	}
 	return &protocol.WriteDataRequest{
-		ProjectId: projectID,
-		Stage:     retail.StageTrial,
-		Data:      marshalProducts,
-		Extra:     map[string]string{"extra_info": "extra"},
+		Stage: retail.StageTrial,
+		Data:  marshalProducts,
+		Extra: map[string]string{"extra_info": "extra"},
+	}
+}
+
+func finishWriteProductsExample() {
+	// The "FinishXXX" api can mark max to 100 dates at one request
+	request := buildFinishProductRequest()
+	opts := defaultOptions(DefaultFinishTimeout)
+	response, err := client.FinishWriteProducts(request, opts...)
+	if err != nil {
+		logs.Error("run finish occur error, msg:%v", err)
+		return
+	}
+	if core.IsUploadSuccess(response.GetStatus().GetCode()) {
+		logs.Info("finish write product data")
+		return
+	}
+	logs.Error("fail to finish write product data, msg:%s errItems:%+v",
+		response.GetStatus(), response.GetErrors())
+}
+
+func buildFinishProductRequest() *protocol.FinishWriteDataRequest {
+	return &protocol.FinishWriteDataRequest{
+		Stage: retail.StageIncrementalDaily,
 	}
 }
 
@@ -163,10 +223,110 @@ func buildWriteUserEventsRequest(count int) *protocol.WriteDataRequest {
 		marshalUserEvents = append(marshalUserEvents, string(marshalUserEvent))
 	}
 	return &protocol.WriteDataRequest{
-		ProjectId: projectID,
-		Stage:     retail.StageTrial,
-		Data:      marshalUserEvents,
-		Extra:     map[string]string{"extra_info": "extra"},
+		Stage: retail.StageTrial,
+		Data:  marshalUserEvents,
+		Extra: map[string]string{"extra_info": "extra"},
+	}
+}
+
+func finishWriteUserEventsExample() {
+	// The "FinishXXX" api can mark max to 100 dates at one request
+	request := buildFinishUserEventRequest()
+	opts := defaultOptions(DefaultFinishTimeout)
+	response, err := client.FinishWriteUserEvents(request, opts...)
+	if err != nil {
+		logs.Error("run finish occur error, msg:%v", err)
+		return
+	}
+	if core.IsUploadSuccess(response.GetStatus().GetCode()) {
+		logs.Info("finish user event product data")
+		return
+	}
+	logs.Error("fail to finish write user event data, msg:%s errItems:%+v",
+		response.GetStatus(), response.GetErrors())
+}
+
+func buildFinishUserEventRequest() *protocol.FinishWriteDataRequest {
+	// dates should be passed when finishing others
+	dates := []*protocol.Date{
+		{
+			Year:  2022,
+			Month: 2,
+			Day:   1,
+		}}
+	return &protocol.FinishWriteDataRequest{
+		Stage:     retail.StageIncrementalDaily,
+		DataDates: dates,
+	}
+}
+
+func writeOthersExample() {
+	// The "WriteXXX" api can transfer max to 2000 items at one request
+	// The `topic` is datatype, which specify the type of data users are going to write.
+	// It is temporarily set to "video", the specific value depends on your need.
+	topic := "video"
+	request := buildWriteOthersRequest(topic)
+	opts := defaultOptions(DefaultWriteTimeout)
+	response, err := client.WriteOthers(request, opts...)
+	if err != nil {
+		logs.Error("write others occur err, msg:%v", err)
+		return
+	}
+	if core.IsUploadSuccess(response.GetStatus().GetCode()) {
+		logs.Info("write others success")
+		return
+	}
+	logs.Error("write others find failure info, msg:%s errItems:%+v",
+		response.GetStatus(), response.GetErrors())
+}
+
+func buildWriteOthersRequest(topic string) *protocol.WriteDataRequest {
+	data := map[string]interface{}{
+		"field1": 1,
+		"field2": "value2",
+	}
+	marshalData, _ := json.Marshal(data)
+	datas := []string{string(marshalData)}
+	return &protocol.WriteDataRequest{
+		Stage: retail.StageTrial,
+		Topic: topic,
+		Data:  datas,
+		Extra: map[string]string{"extra_info": "extra"},
+	}
+}
+
+func finishWriteOthersExample() {
+	// The "FinishXXX" api can mark max to 100 dates at one request
+	// The `topic` is datatype, which specify the type of data users are going to finish writing.
+	// It is temporarily set to "video", the specific value depends on your need.
+	topic := "video"
+	request := buildFinishOthersRequest(topic)
+	opts := defaultOptions(DefaultFinishTimeout)
+	response, err := client.FinishWriteOthers(request, opts...)
+	if err != nil {
+		logs.Error("run finish occur error, msg:%v", err)
+		return
+	}
+	if core.IsUploadSuccess(response.GetStatus().GetCode()) {
+		logs.Info("finish writing data")
+		return
+	}
+	logs.Error("fail to finish write data, msg:%s errItems:%+v",
+		response.GetStatus(), response.GetErrors())
+}
+
+func buildFinishOthersRequest(topic string) *protocol.FinishWriteDataRequest {
+	// dates should be passed when finishing others
+	dates := []*protocol.Date{
+		{
+			Year:  2022,
+			Month: 1,
+			Day:   1,
+		}}
+	return &protocol.FinishWriteDataRequest{
+		Stage:     retail.StageIncrementalDaily,
+		DataDates: dates,
+		Topic:     topic,
 	}
 }
 
@@ -210,12 +370,11 @@ func buildPredictRequest() *protocol.PredictRequest {
 		CandidateProductIds: []string{"632462", "632463"},
 	}
 	return &protocol.PredictRequest{
-		ProjectId: projectID,
-		ModelId:   modelID,
-		UserId:    "1457789",
-		Size:      20,
-		Scene:     scene,
-		Context:   context,
+		ModelId: modelID,
+		UserId:  "1457789",
+		Size:    20,
+		Scene:   scene,
+		Context: context,
 		// Extra:     map[string]string{"extra_info": "extra"},
 	}
 }
@@ -249,7 +408,6 @@ func buildAckRequest(predictRequestId string, predictRequest *protocol.PredictRe
 	alteredProducts []*protocol.AckServerImpressionsRequest_AlteredProduct) *protocol.AckServerImpressionsRequest {
 
 	return &protocol.AckServerImpressionsRequest{
-		ProjectId:        predictRequest.GetProjectId(),
 		ModelId:          predictRequest.GetModelId(),
 		PredictRequestId: predictRequestId,
 		UserId:           predictRequest.GetUserId(),
