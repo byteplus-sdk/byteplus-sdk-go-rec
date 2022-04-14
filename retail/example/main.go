@@ -418,19 +418,13 @@ func buildAckRequest(predictRequestId string, predictRequest *protocol.PredictRe
 
 func defaultOptions(timeout time.Duration) []option.Option {
 	// All options are optional
-	// var customerHeaders map[string]string
-	// var customerQueries map[string]string
 	opts := []option.Option{
 		option.WithRequestID(uuid.NewString()),
 		option.WithTimeout(timeout),
-		// Optional. Add a set of customer headers to the request, which will be overwritten by multiple calls.
-		//option.WithHeaders(customerHeaders),
-		// Optional. Add a set of customer queries to the request, which will be overwritten by multiple calls.
-		//option.WithQueries(customerQueries),
-		// Optional. Add a header to an existing custom header collection.
-		//option.WithHeader("key", "value"),
-		// Optional. Add a query to an existing custom query collection.
-		//option.WithQuery("key", "value"),
+		// Optional. Add a header to a custom http header collection.
+		//option.WithHTTPHeader("key", "value"),
+		// Optional. Add a query to a custom query collection.
+		//option.WithHTTPQuery("key", "value"),
 		// Optional. It is expected that the server will process the data for the maximum time.
 		// If the processing time exceeds this time, the server will return the result immediately,
 		// regardless of whether there is any remaining data that has not been processed.
