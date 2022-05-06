@@ -411,7 +411,7 @@ message WriteDataRequest{
   string topic = 3;
 
   // Required
-  // Array of json strings.
+  // Array of json strings. The array size is max to 2000.
   // Each element of the array is a json serialized string of customer data.
   repeated string data = 10;
 
@@ -457,10 +457,13 @@ message PredictRequest {
     // Make sure this is as close to `UserEvent.device` as possible.
     Device device = 2;
 
-    // Optional.
+    reserved 3;
+    reserved "candidate_product_ids";
+
+    // Optional
     // The list of candidates for the recommendation.
     // If this is empty, all products are the candidates.
-    repeated string candidate_product_ids = 3;
+    repeated Product candidate_products = 4;
   }
 
   // Optional.
@@ -577,6 +580,11 @@ message AckServerImpressionsRequest {
     // If `product_id` is a number, `product_id_hash` equals to `product_id`
     // If `product_id` is not a number, `product_id_hash` equals to `fnv(product_id)`
     int64 product_id_hash = 100;
+
+    // Optional.
+    // This is a catch-all field to pass all the additional information.
+    // Please provide as much information as possible.
+    map<string, string> extra = 101;
   }
 
   // Required.

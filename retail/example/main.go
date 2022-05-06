@@ -116,7 +116,7 @@ func buildWriteUsersRequest(count int) *protocol.WriteDataRequest {
 		marshalUsers = append(marshalUsers, string(marshalUser))
 	}
 	return &protocol.WriteDataRequest{
-		Stage: retail.StageTrial,
+		Stage: retail.StageIncremental,
 		Data:  marshalUsers,
 		Extra: map[string]string{"extra_info": "extra"},
 	}
@@ -140,7 +140,7 @@ func finishWriteUsersExample() {
 
 func buildFinishUserRequest() *protocol.FinishWriteDataRequest {
 	return &protocol.FinishWriteDataRequest{
-		Stage: retail.StageIncrementalDaily,
+		Stage: retail.StageIncremental,
 	}
 }
 
@@ -169,7 +169,7 @@ func buildWriteProductsRequest(count int) *protocol.WriteDataRequest {
 		marshalProducts = append(marshalProducts, string(marshalProduct))
 	}
 	return &protocol.WriteDataRequest{
-		Stage: retail.StageTrial,
+		Stage: retail.StageIncremental,
 		Data:  marshalProducts,
 		Extra: map[string]string{"extra_info": "extra"},
 	}
@@ -194,7 +194,7 @@ func finishWriteProductsExample() {
 
 func buildFinishProductRequest() *protocol.FinishWriteDataRequest {
 	return &protocol.FinishWriteDataRequest{
-		Stage: retail.StageIncrementalDaily,
+		Stage: retail.StageIncremental,
 	}
 }
 
@@ -223,7 +223,7 @@ func buildWriteUserEventsRequest(count int) *protocol.WriteDataRequest {
 		marshalUserEvents = append(marshalUserEvents, string(marshalUserEvent))
 	}
 	return &protocol.WriteDataRequest{
-		Stage: retail.StageTrial,
+		Stage: retail.StageIncremental,
 		Data:  marshalUserEvents,
 		Extra: map[string]string{"extra_info": "extra"},
 	}
@@ -255,7 +255,7 @@ func buildFinishUserEventRequest() *protocol.FinishWriteDataRequest {
 			Day:   1,
 		}}
 	return &protocol.FinishWriteDataRequest{
-		Stage:     retail.StageIncrementalDaily,
+		Stage:     retail.StageIncremental,
 		DataDates: dates,
 	}
 }
@@ -288,7 +288,7 @@ func buildWriteOthersRequest(topic string) *protocol.WriteDataRequest {
 	marshalData, _ := json.Marshal(data)
 	datas := []string{string(marshalData)}
 	return &protocol.WriteDataRequest{
-		Stage: retail.StageTrial,
+		Stage: retail.StageIncremental,
 		Topic: topic,
 		Data:  datas,
 		Extra: map[string]string{"extra_info": "extra"},
@@ -324,7 +324,7 @@ func buildFinishOthersRequest(topic string) *protocol.FinishWriteDataRequest {
 			Day:   1,
 		}}
 	return &protocol.FinishWriteDataRequest{
-		Stage:     retail.StageIncrementalDaily,
+		Stage:     retail.StageIncremental,
 		DataDates: dates,
 		Topic:     topic,
 	}
@@ -365,9 +365,9 @@ func buildPredictRequest() *protocol.PredictRequest {
 	rootProduct := mockPredictProduct()
 	device := mockPredictDevice()
 	context := &protocol.PredictRequest_Context{
-		RootProduct:         rootProduct,
-		Device:              device,
-		CandidateProductIds: []string{"632462", "632463"},
+		RootProduct:       rootProduct,
+		Device:            device,
+		CandidateProducts: []*protocol.Product{mockPredictProduct()},
 	}
 	return &protocol.PredictRequest{
 		ModelId: modelID,

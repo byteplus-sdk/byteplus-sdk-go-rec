@@ -12,10 +12,15 @@ const (
 	// StageProduction In this stage, data will be used to train model
 	StageProduction = "production"
 
+	// StageIncremental In this stage, data will be used to update model
+	StageIncremental = "incremental_sync_streaming"
+
 	// StageIncrementalRealtime In this stage, data will be used to realtime update model
+	// Please use `STAGE_INCREMENTAL` instead `STAGE_INCREMENTAL_REALTIME` in most cases
 	StageIncrementalRealtime = "incremental_sync_streaming"
 
 	// StageIncrementalDaily In this stage, data will be used to daily update model
+	// Please use `STAGE_INCREMENTAL` instead `STAGE_INCREMENTAL_DAILY` in most cases
 	StageIncrementalDaily = "incremental_sync_daily"
 
 	// TopicUser Topic if write users and finish write users
