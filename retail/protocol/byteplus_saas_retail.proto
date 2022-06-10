@@ -550,6 +550,9 @@ message AckServerImpressionsRequest {
 
   // Required.
   // This should be the traffic source.
+  // The acceptable values are ["self", "byteplus", "other"].
+  // Please refer to
+  // [this](../docs/ways-to-improve-recommendation-performance#use-usereventrec_info-and-usereventtraffic_source) for more details.
   string traffic_source = 12;
 
   // Required.
@@ -590,6 +593,11 @@ message AckServerImpressionsRequest {
   // Required.
   // The list of altered products.
   repeated AlteredProduct altered_products = 14;
+
+  // Optional.
+  // This is a catch-all field to pass all the additional information.
+  // Please provide as much information as possible.
+  map<string, string> extra = 100;
 }
 
 // The response message for AckServerImpressions.
