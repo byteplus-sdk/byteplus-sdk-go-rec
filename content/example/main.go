@@ -9,18 +9,14 @@ import (
 	core "github.com/byteplus-sdk/byteplus-sdk-go-rec-core"
 	"github.com/byteplus-sdk/byteplus-sdk-go-rec-core/logs"
 	"github.com/byteplus-sdk/byteplus-sdk-go-rec-core/option"
+	"github.com/byteplus-sdk/byteplus-sdk-go-rec/content"
+	"github.com/byteplus-sdk/byteplus-sdk-go-rec/content/protocol"
 	"github.com/byteplus-sdk/byteplus-sdk-go-rec/region"
-	"github.com/byteplus-sdk/byteplus-sdk-go-rec/retail"
-	"github.com/byteplus-sdk/byteplus-sdk-go-rec/retail/protocol"
 	"github.com/google/uuid"
 )
 
 const (
 	DefaultWriteTimeout = 800 * time.Millisecond
-
-	DefaultPredictTimeout = 800 * time.Millisecond
-
-	DefaultAckImpressionsTimeout = 800 * time.Millisecond
 
 	DefaultFinishTimeout = 800 * time.Millisecond
 
@@ -28,16 +24,12 @@ const (
 )
 
 var (
-	client retail.Client
+	client content.Client
 )
 
 const (
 	// A unique identity assigned by Bytedance.
 	projectID = "***********"
-
-	// Unique id for this model.
-	// The saas model id that can be used to get rec results from predict api, which is need to fill in URL.
-	modelID = "***********"
 )
 
 func init() {
@@ -67,7 +59,7 @@ func init() {
 
 	logs.Level = logs.LevelDebug
 	var err error
-	client, err = retail.NewClientBuilder().
+	client, err = content.NewClientBuilder().
 		AccountID("***********"). // Required. The account id of byteplus.
 		ProjectID(projectID).
 		Region(region.SG).     // Required. The region of the server used to provide service.
@@ -91,11 +83,11 @@ func main() {
 	// Finish write real-time user data
 	//finishWriteUsersExample()
 
-	// Write real-time product data
-	writeProductsExample()
+	// Write real-time content data
+	writeContentsExample()
 
-	// Finish write real-time product data
-	//finishWriteProductsExample()
+	// Finish write real-time content data
+	//finishWriteContentsExample()
 
 	// Write real-time user event data
 	writeUserEventsExample()
@@ -108,9 +100,6 @@ func main() {
 
 	// Finish write self defined topic data
 	//finishWriteOthersExample()
-
-	// Get recommendation results
-	recommendExample()
 
 	// Pause for 5 seconds until the asynchronous import task completes
 	time.Sleep(5 * time.Second)
@@ -143,7 +132,7 @@ func buildWriteUsersRequest(count int) *protocol.WriteDataRequest {
 		marshalUsers = append(marshalUsers, string(marshalUser))
 	}
 	return &protocol.WriteDataRequest{
-		Stage: retail.StageIncremental,
+		Stage: content.StageIncremental,
 		Data:  marshalUsers,
 		Extra: map[string]string{"extra_info": "extra"},
 	}
@@ -167,61 +156,61 @@ func finishWriteUsersExample() {
 
 func buildFinishUserRequest() *protocol.FinishWriteDataRequest {
 	return &protocol.FinishWriteDataRequest{
-		Stage: retail.StageIncremental,
+		Stage: content.StageIncremental,
 	}
 }
 
-func writeProductsExample() {
+func writeContentsExample() {
 	// The "WriteXXX" api can transfer max to 2000 items at one request
-	request := buildWriteProductsRequest(1)
+	request := buildWriteContentsRequest(1)
 	opts := defaultOptions(DefaultWriteTimeout)
-	response, err := client.WriteProducts(request, opts...)
+	response, err := client.WriteContents(request, opts...)
 	if err != nil {
-		logs.Error("write product occur err, msg:%v", err)
+		logs.Error("write content occur err, msg:%v", err)
 		return
 	}
 	if core.IsUploadSuccess(response.GetStatus().GetCode()) {
-		logs.Info("write product success")
+		logs.Info("write content success")
 		return
 	}
-	logs.Error("write product find failure info, msg:%s errItems:%+v",
+	logs.Error("write content find failure info, msg:%s errItems:%+v",
 		response.GetStatus(), response.GetErrors())
 }
 
-func buildWriteProductsRequest(count int) *protocol.WriteDataRequest {
-	products := mockProducts(count)
-	marshalProducts := make([]string, 0, len(products))
-	for _, product := range products {
-		marshalProduct, _ := json.Marshal(product)
-		marshalProducts = append(marshalProducts, string(marshalProduct))
+func buildWriteContentsRequest(count int) *protocol.WriteDataRequest {
+	contents := mockContents(count)
+	marshalContents := make([]string, 0, len(contents))
+	for _, content := range contents {
+		marshalContent, _ := json.Marshal(content)
+		marshalContents = append(marshalContents, string(marshalContent))
 	}
 	return &protocol.WriteDataRequest{
-		Stage: retail.StageIncremental,
-		Data:  marshalProducts,
+		Stage: content.StageIncremental,
+		Data:  marshalContents,
 		Extra: map[string]string{"extra_info": "extra"},
 	}
 }
 
-func finishWriteProductsExample() {
+func finishWriteContentsExample() {
 	// The "FinishXXX" api can mark max to 100 dates at one request
-	request := buildFinishProductRequest()
+	request := buildFinishContentRequest()
 	opts := defaultOptions(DefaultFinishTimeout)
-	response, err := client.FinishWriteProducts(request, opts...)
+	response, err := client.FinishWriteContents(request, opts...)
 	if err != nil {
 		logs.Error("run finish occur error, msg:%v", err)
 		return
 	}
 	if core.IsUploadSuccess(response.GetStatus().GetCode()) {
-		logs.Info("finish write product data")
+		logs.Info("finish write content data")
 		return
 	}
-	logs.Error("fail to finish write product data, msg:%s errItems:%+v",
+	logs.Error("fail to finish write content data, msg:%s errItems:%+v",
 		response.GetStatus(), response.GetErrors())
 }
 
-func buildFinishProductRequest() *protocol.FinishWriteDataRequest {
+func buildFinishContentRequest() *protocol.FinishWriteDataRequest {
 	return &protocol.FinishWriteDataRequest{
-		Stage: retail.StageIncremental,
+		Stage: content.StageIncremental,
 	}
 }
 
@@ -250,7 +239,7 @@ func buildWriteUserEventsRequest(count int) *protocol.WriteDataRequest {
 		marshalUserEvents = append(marshalUserEvents, string(marshalUserEvent))
 	}
 	return &protocol.WriteDataRequest{
-		Stage: retail.StageIncremental,
+		Stage: content.StageIncremental,
 		Data:  marshalUserEvents,
 		Extra: map[string]string{"extra_info": "extra"},
 	}
@@ -266,7 +255,7 @@ func finishWriteUserEventsExample() {
 		return
 	}
 	if core.IsUploadSuccess(response.GetStatus().GetCode()) {
-		logs.Info("finish user event product data")
+		logs.Info("finish write user event data")
 		return
 	}
 	logs.Error("fail to finish write user event data, msg:%s errItems:%+v",
@@ -282,7 +271,7 @@ func buildFinishUserEventRequest() *protocol.FinishWriteDataRequest {
 			Day:   1,
 		}}
 	return &protocol.FinishWriteDataRequest{
-		Stage:     retail.StageIncremental,
+		Stage:     content.StageIncremental,
 		DataDates: dates,
 	}
 }
@@ -315,7 +304,7 @@ func buildWriteOthersRequest(topic string) *protocol.WriteDataRequest {
 	marshalData, _ := json.Marshal(data)
 	datas := []string{string(marshalData)}
 	return &protocol.WriteDataRequest{
-		Stage: retail.StageIncremental,
+		Stage: content.StageIncremental,
 		Topic: topic,
 		Data:  datas,
 		Extra: map[string]string{"extra_info": "extra"},
@@ -351,99 +340,9 @@ func buildFinishOthersRequest(topic string) *protocol.FinishWriteDataRequest {
 			Day:   1,
 		}}
 	return &protocol.FinishWriteDataRequest{
-		Stage:     retail.StageIncremental,
+		Stage:     content.StageIncremental,
 		DataDates: dates,
 		Topic:     topic,
-	}
-}
-
-func recommendExample() {
-	predictRequest := buildPredictRequest()
-	predictOpts := defaultOptions(DefaultPredictTimeout)
-	// The "home" is scene name, which provided by ByteDance, usually is "home"
-	response, err := client.Predict(predictRequest, predictOpts...)
-	if err != nil {
-		logs.Error("predict occur error, msg:%v", err)
-		return
-	}
-	if !core.IsSuccess(response.GetStatus().GetCode()) {
-		logs.Error("predict find failure info, msg:%s", response.GetStatus())
-		return
-	}
-	logs.Info("predict success")
-	// The items, which is eventually shown to user,
-	// should send back to Bytedance for deduplication
-	alteredProducts := recommendWithPredictResult(response.GetValue())
-	ackRequest := buildAckRequest(response.GetRequestId(), predictRequest, alteredProducts)
-	ackOpts := defaultOptions(DefaultAckImpressionsTimeout)
-	// async ack the actual impressions after this recommendation
-	core.AsyncExecute(func() {
-		_ = core.DoWithRetry(DefaultRetryTimes, func() error {
-			_, err := client.AckServerImpressions(ackRequest, ackOpts...)
-			return err
-		})
-	})
-}
-
-func buildPredictRequest() *protocol.PredictRequest {
-	scene := &protocol.Scene{
-		Offset: 10,
-	}
-	rootProduct := mockPredictProduct()
-	device := mockPredictDevice()
-	context := &protocol.PredictRequest_Context{
-		RootProduct:       rootProduct,
-		Device:            device,
-		CandidateProducts: []*protocol.Product{mockPredictProduct()},
-	}
-	return &protocol.PredictRequest{
-		ModelId: modelID,
-		UserId:  "1457789",
-		Size:    20,
-		Scene:   scene,
-		Context: context,
-		// Extra:     map[string]string{"extra_info": "extra"},
-	}
-}
-
-func recommendWithPredictResult(
-	predictResult *protocol.PredictResult) []*protocol.AckServerImpressionsRequest_AlteredProduct {
-	// You can handle recommend results here,
-	// such as filter, insert other items, sort again, etc.
-	// The list of goods finally displayed to user and the filtered goods
-	// should be sent back to bytedance for deduplication
-	return conv2AlteredProducts(predictResult.GetResponseProducts())
-}
-
-func conv2AlteredProducts(
-	products []*protocol.PredictResult_ResponseProduct) []*protocol.AckServerImpressionsRequest_AlteredProduct {
-	if len(products) == 0 {
-		return nil
-	}
-	alteredProducts := make([]*protocol.AckServerImpressionsRequest_AlteredProduct, len(products))
-	for i, product := range products {
-		alteredProducts[i] = &protocol.AckServerImpressionsRequest_AlteredProduct{
-			AlteredReason: "kept",
-			ProductId:     product.GetProductId(),
-			Rank:          int32(i + 1),
-		}
-	}
-	return alteredProducts
-}
-
-func buildAckRequest(predictRequestId string, predictRequest *protocol.PredictRequest,
-	alteredProducts []*protocol.AckServerImpressionsRequest_AlteredProduct) *protocol.AckServerImpressionsRequest {
-
-	return &protocol.AckServerImpressionsRequest{
-		ModelId:          predictRequest.GetModelId(),
-		PredictRequestId: predictRequestId,
-		UserId:           predictRequest.GetUserId(),
-		// If it is the recommendation result from byteplus, traffic_source is byteplus,
-		// if it is the customer's own recommendation result, traffic_source is self.
-		TrafficSource:   "byteplus",
-		Scene:           predictRequest.GetScene(),
-		AlteredProducts: alteredProducts,
-		// Extra:            map[string]string{"ip": "127.0.0.1"},
 	}
 }
 

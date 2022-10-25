@@ -1,11 +1,10 @@
-package retail
+package content
 
 import (
 	"errors"
 
 	core "github.com/byteplus-sdk/byteplus-sdk-go-rec-core"
 	"github.com/byteplus-sdk/byteplus-sdk-go-rec-core/metrics"
-	_ "github.com/byteplus-sdk/byteplus-sdk-go-rec/region"
 )
 
 type clientBuilder struct {

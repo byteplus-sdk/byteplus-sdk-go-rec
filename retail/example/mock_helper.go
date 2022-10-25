@@ -18,13 +18,12 @@ func mockUsers(count int) []*DemoUser {
 
 func mockUser() *DemoUser {
 	return &DemoUser{
-		UserId:                 "1457789",
 		Gender:                 "male",
 		Age:                    "23",
 		Tags:                   `["new user","low purchasing power","bargain seeker"]`,
 		ActivationChannel:      "AppStore",
 		MembershipLevel:        "silver",
-		RegistrationTimestamp:  1623593487,
+		RegistrationTimestamp:  1651818792,
 		LocationCity:           "Kirkland",
 		LocationCountry:        "USA",
 		LocationDistrictOrArea: "King County",
@@ -50,7 +49,7 @@ func mockProduct() *DemoProduct {
 		Brands:                        "Adidas",
 		PriceCurrentPrice:             49900,
 		PriceOriginPrice:              69900,
-		IsRecommendable:               true,
+		IsRecommendable:               1,
 		Title:                         "adidas Men's Yeezy Boost 350 V2 Grey/Borang/Dgsogr",
 		QualityScore:                  4.4,
 		Tags:                          `["New Product","Summer Product"]`,
@@ -82,7 +81,7 @@ func mockUserEvent() *DemoUserEvent {
 	return &DemoUserEvent{
 		UserId:               "1457789",
 		EventType:            "purchase",
-		EventTimestamp:       1623681888,
+		EventTimestamp:       1651818792,
 		Scene:                "product detail page",
 		ScenePageNumber:      2,
 		SceneOffset:          10,

@@ -19,7 +19,7 @@ type DemoProduct struct {
 	ProductId                     string  `json:"product_id,omitempty"`
 	Category                      string  `json:"category,omitempty"` // json array
 	Brands                        string  `json:"brands,omitempty"`
-	IsRecommendable               bool    `json:"is_recommendable,omitempty"`
+	IsRecommendable               int32   `json:"is_recommendable,omitempty"`
 	Title                         string  `json:"title,omitempty"`
 	PriceCurrentPrice             int64   `json:"price_current_price,omitempty"`
 	PriceOriginPrice              int64   `json:"price_origin_price,omitempty"`

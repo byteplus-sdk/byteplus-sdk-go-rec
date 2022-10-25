@@ -1,0 +1,158 @@
+syntax = "proto3";
+package bytedance.byteplus.rec.content;
+option java_package = "com.byteplus.rec.sdk.content.protocol";
+option go_package = "github.com/byteplus-sdk/byteplus-sdk-go-rec/content/protocol";
+
+// The `Status` type defines a logical error model, Each `Status` message
+// contains 2 pieces of data: error code, error message.
+/// Chinese version.
+///
+message Status {
+  // Output only.
+  // The error code. Callers should expect this field for all
+  // responses.
+  // Here is the table for the possible codes.
+  // 0   : The request is successfully returned. Other values indicates errors.
+  // xxx : The 3-digit error codes align with standard http error codes, e.g.
+  //       4xx indicates user error while 5xx indicates server error.
+  // 1xxx: The errors related to Import calls.
+  // 2xxx: The errors related to Predict calls.
+  // Please refer to [this](../docs/error-code) for more details.
+  int32 code = 1;
+
+  // Output only. Detailed error message.
+  string message = 2;
+
+  // Output only. success mark
+  bool success = 3;
+}
+
+// Represents a whole or partial calendar date, such as a birthday. The time of
+// day and time zone are either specified elsewhere or are insignificant. The
+// date is relative to the Gregorian Calendar. This can represent one of the
+// following:
+//
+// * A full date, with non-zero year, month, and day values
+// * A month and day value, with a zero year, such as an anniversary
+// * A year on its own, with zero month and day values
+// * A year and month value, with a zero day, such as a credit card expiration
+// date
+message Date {
+  // Year of the date. Must be from 1 to 9999, or 0 to specify a date without
+  // a year.
+  int32 year = 1;
+
+  // Month of a year. Must be from 1 to 12, or 0 to specify a year without a
+  // month and day.
+  int32 month = 2;
+
+  // Day of a month. Must be from 1 to 31 and valid for the year and month, or 0
+  // to specify a year by itself or a year and month where the day isn't
+  // significant.
+  int32 day = 3;
+}
+
+
+message FinishWriteDataRequest{
+  // Required
+  // Id of the recommendation project.
+  string project_id = 1;
+
+  // Required
+  // The stage of importing data，Corresponding to the three synchronization stages of the recommendation platform
+  // Possible type values:
+  // "trial":Test data/pre-synchronization stage
+  // "production": Historical data synchronization stage
+  // "incremental_sync_streaming":Incremental real-time data synchronization stage
+  string stage = 2;
+
+  // Optional.
+  // topic is datatype, which specify the type of data users are going to write.
+  // in WriteOthers, topic should not be missing in request, In other cases, the topic can be omitted.
+  // The acceptable values are "user", "goods", "behavior", and "others"
+  // user: user data
+  // content: content data
+  // behavior: user event data
+  // others: It is temporarily set to "others", the specific value depends on your need.
+  string topic = 3;
+
+  // Optional.
+  // When finish user events, data_dates should not be missing
+  repeated Date data_dates = 10;
+}
+
+// Summary of error messages in imported data processing
+message DataError {
+  // Detail error message, which should be in English.
+  // Example, "An unexpected value XXX is included in the XXX field, only ["xx", "yy", "zz"] can be accepted"
+  string message = 1;
+
+  // Specific abnormal data
+  string data = 2;
+}
+
+message WriteResponse {
+  // Task execution result.
+  // when status.code is 0, no exception occurred during execution, and all writing was successful
+  Status status = 1;
+
+  // When status.code is 1206, errors has a value.
+  // Some data may fail to be processed during the writing process, and all failure information will be returned through errors.
+  // If status.code is not 0, but errors has no value, it means that all data is Write failed
+  repeated DataError errors = 2;
+}
+
+// general write request,supported import realtime data
+message WriteDataRequest{
+  // Required
+  // Id of the recommendation project.
+  string project_id = 1;
+
+  // Required
+  // The stage of importing data，Corresponding to the three synchronization stages of the recommendation platform
+  // Possible type values:
+  // "trial":Test data/pre-synchronization stage
+  // "production": Historical data synchronization stage
+  // "incremental_sync_streaming":Incremental real-time data synchronization stage
+  string stage = 2;
+
+  // Optional.
+  // topic is datatype, which specify the type of data users are going to write.
+  // in WriteOthers, topic should not be missing in request, In other cases, the topic can be omitted.
+  // The acceptable values are "user", "content", "behavior", and "others"
+  // user: user data
+  // content: content data
+  // behavior: user event data
+  // others: It is temporarily set to "others", the specific value depends on your need.
+  string topic = 3;
+
+  // Required
+  // Array of json strings. The array size is max to 2000.
+  // Each element of the array is a json serialized string of customer data.
+  repeated string data = 10;
+
+  // Optional.
+  // This is a catch-all field to pass all the additional information.
+  // Please provide as much information as possible.
+  map<string, string> extra = 100;
+}
+
+// The BytePlus Saas service.
+service BytePlusSaasService {
+  // Write
+  //
+  // Writes at most 2000 data at a time. Exceeding 2000 in a request results in
+  // a rejection. One can use this to upload new data, or update existing
+  // data (by providing all the fields, some data type not support update, e.g. user event).
+  rpc WritUsers(WriteDataRequest) returns (WriteResponse);
+  rpc WritContents(WriteDataRequest) returns (WriteResponse);
+  rpc WritUserEvents(WriteDataRequest) returns (WriteResponse);
+  // Byteplus Recommend premium only. Upload and write additional data to Byteplus Recommend.
+  rpc WriteOthers(WriteDataRequest) returns (WriteResponse);
+
+  // Finish
+  //
+  // Finish a certain data transfer process. Finish at most 100 data at a time.
+  // May pass a date list to mark the completion of data synchronization for these days.
+  rpc Finish(FinishWriteDataRequest) returns (WriteResponse);
+}
