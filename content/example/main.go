@@ -20,6 +20,10 @@ const (
 
 	DefaultFinishTimeout = 800 * time.Millisecond
 
+	DefaultPredictTimeout = 800 * time.Millisecond
+
+	DefaultAckImpressionsTimeout = 800 * time.Millisecond
+
 	DefaultRetryTimes = 2
 )
 
@@ -30,6 +34,10 @@ var (
 const (
 	// A unique identity assigned by Bytedance.
 	projectID = "***********"
+
+	// Unique id for this model.
+	// The saas model id that can be used to get rec results from predict api, which is need to fill in URL.
+	modelID = "***********"
 )
 
 func init() {
@@ -100,6 +108,9 @@ func main() {
 
 	// Finish write self defined topic data
 	//finishWriteOthersExample()
+
+	// Get recommendation results
+	recommendExample()
 
 	// Pause for 5 seconds until the asynchronous import task completes
 	time.Sleep(5 * time.Second)
@@ -343,6 +354,96 @@ func buildFinishOthersRequest(topic string) *protocol.FinishWriteDataRequest {
 		Stage:     content.StageIncremental,
 		DataDates: dates,
 		Topic:     topic,
+	}
+}
+
+func recommendExample() {
+	predictRequest := buildPredictRequest()
+	predictOpts := defaultOptions(DefaultPredictTimeout)
+	// The "home" is scene name, which provided by ByteDance, usually is "home"
+	response, err := client.Predict(predictRequest, predictOpts...)
+	if err != nil {
+		logs.Error("predict occur error, msg:%v", err)
+		return
+	}
+	if !core.IsSuccess(response.GetStatus().GetCode()) {
+		logs.Error("predict find failure info, msg:%s", response.GetStatus())
+		return
+	}
+	logs.Info("predict success")
+	// The items, which is eventually shown to user,
+	// should send back to Bytedance for deduplication
+	alteredContents := recommendWithPredictResult(response.GetContentValue())
+	ackRequest := buildAckRequest(response.GetRequestId(), predictRequest, alteredContents)
+	ackOpts := defaultOptions(DefaultAckImpressionsTimeout)
+	// async ack the actual impressions after this recommendation
+	core.AsyncExecute(func() {
+		_ = core.DoWithRetry(DefaultRetryTimes, func() error {
+			_, err := client.AckServerImpressions(ackRequest, ackOpts...)
+			return err
+		})
+	})
+}
+
+func buildPredictRequest() *protocol.PredictRequest {
+	scene := &protocol.Scene{
+		Offset: 10,
+	}
+	rootContent := mockPredictContent()
+	device := mockPredictDevice()
+	context := &protocol.PredictRequest_Context{
+		RootContent:       rootContent,
+		Device:            device,
+		CandidateContents: []*protocol.Content{mockPredictContent()},
+	}
+	return &protocol.PredictRequest{
+		ModelId:        modelID,
+		UserId:         "1457789",
+		Size:           20,
+		Scene:          scene,
+		ContentContext: context,
+		// Extra:     map[string]string{"extra_info": "extra"},
+	}
+}
+
+func recommendWithPredictResult(
+	predictResult *protocol.PredictResult) []*protocol.AckServerImpressionsRequest_AlteredContent {
+	// You can handle recommend results here,
+	// such as filter, insert other items, sort again, etc.
+	// The list of goods finally displayed to user and the filtered goods
+	// should be sent back to bytedance for deduplication
+	return conv2AlteredContents(predictResult.GetResponseContents())
+}
+
+func conv2AlteredContents(
+	contents []*protocol.PredictResult_ResponseContent) []*protocol.AckServerImpressionsRequest_AlteredContent {
+	if len(contents) == 0 {
+		return nil
+	}
+	alteredContents := make([]*protocol.AckServerImpressionsRequest_AlteredContent, len(contents))
+	for i, content := range contents {
+		alteredContents[i] = &protocol.AckServerImpressionsRequest_AlteredContent{
+			AlteredReason: "kept",
+			ContentId:     content.GetContentId(),
+			Rank:          int32(i + 1),
+		}
+	}
+	return alteredContents
+}
+
+func buildAckRequest(predictRequestId string, predictRequest *protocol.PredictRequest,
+	alteredContents []*protocol.AckServerImpressionsRequest_AlteredContent) *protocol.AckServerImpressionsRequest {
+
+	return &protocol.AckServerImpressionsRequest{
+		ModelId:          predictRequest.GetModelId(),
+		PredictRequestId: predictRequestId,
+		UserId:           predictRequest.GetUserId(),
+		// If it is the recommendation result from byteplus, traffic_source is byteplus,
+		// if it is the customer's own recommendation result, traffic_source is self.
+		TrafficSource:   "byteplus",
+		Scene:           predictRequest.GetScene(),
+		AlteredContents: alteredContents,
+		// Extra:            map[string]string{"ip": "127.0.0.1"},
 	}
 }
 

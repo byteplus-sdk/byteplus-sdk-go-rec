@@ -49,4 +49,8 @@ const (
 	OthersUri = "/ContentSaaS/WriteOthers"
 
 	FinishOthersUri = "/ContentSaaS/FinishWriteOthers"
+
+	PredictUri = "/ContentSaaS/Predict"
+
+	AckServerImpressionsUri = "/ContentSaaS/AckServerImpressions"
 )
