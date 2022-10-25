@@ -421,10 +421,10 @@ func conv2AlteredContents(
 		return nil
 	}
 	alteredContents := make([]*protocol.AckServerImpressionsRequest_AlteredContent, len(contents))
-	for i, content := range contents {
+	for i, aContent := range contents {
 		alteredContents[i] = &protocol.AckServerImpressionsRequest_AlteredContent{
 			AlteredReason: "kept",
-			ContentId:     content.GetContentId(),
+			ContentId:     aContent.GetContentId(),
 			Rank:          int32(i + 1),
 		}
 	}

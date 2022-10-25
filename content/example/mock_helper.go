@@ -181,9 +181,9 @@ func mockPredictContent() *protocol.Content {
 		RelatedContentIds:       `["632462","632463"]`, // Json Array, use json.Marshal().
 		SoldCount:               60,
 		Source:                  "self",
-		Extra: map[string]string{
-			"additionalField": "additionalValue",
-		},
+		//Extra: map[string]string{
+		//	"additionalField": "additionalValue",
+		//},
 	}
 }
 
