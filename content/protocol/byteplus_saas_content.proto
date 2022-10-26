@@ -1,0 +1,732 @@
+syntax = "proto3";
+package bytedance.byteplus.rec.content;
+option java_package = "com.byteplus.rec.sdk.content.protocol";
+option go_package = "github.com/byteplus-sdk/byteplus-sdk-go-rec/content/protocol";
+
+// The `Status` type defines a logical error model, Each `Status` message
+// contains 2 pieces of data: error code, error message.
+/// Chinese version.
+///
+message Status {
+  // Output only.
+  // The error code. Callers should expect this field for all
+  // responses.
+  // Here is the table for the possible codes.
+  // 0   : The request is successfully returned. Other values indicates errors.
+  // xxx : The 3-digit error codes align with standard http error codes, e.g.
+  //       4xx indicates user error while 5xx indicates server error.
+  // 1xxx: The errors related to Import calls.
+  // 2xxx: The errors related to Predict calls.
+  // Please refer to [this](../docs/error-code) for more details.
+  int32 code = 1;
+
+  // Output only. Detailed error message.
+  string message = 2;
+
+  // Output only. success mark
+  bool success = 3;
+}
+
+// Represents a whole or partial calendar date, such as a birthday. The time of
+// day and time zone are either specified elsewhere or are insignificant. The
+// date is relative to the Gregorian Calendar. This can represent one of the
+// following:
+//
+// * A full date, with non-zero year, month, and day values
+// * A month and day value, with a zero year, such as an anniversary
+// * A year on its own, with zero month and day values
+// * A year and month value, with a zero day, such as a credit card expiration
+// date
+message Date {
+  // Year of the date. Must be from 1 to 9999, or 0 to specify a date without
+  // a year.
+  int32 year = 1;
+
+  // Month of a year. Must be from 1 to 12, or 0 to specify a year without a
+  // month and day.
+  int32 month = 2;
+
+  // Day of a month. Must be from 1 to 31 and valid for the year and month, or 0
+  // to specify a year by itself or a year and month where the day isn't
+  // significant.
+  int32 day = 3;
+}
+
+
+message FinishWriteDataRequest{
+  // Required
+  // Id of the recommendation project.
+  string project_id = 1;
+
+  // Required
+  // The stage of importing data，Corresponding to the three synchronization stages of the recommendation platform
+  // Possible type values:
+  // "trial":Test data/pre-synchronization stage
+  // "production": Historical data synchronization stage
+  // "incremental_sync_streaming":Incremental real-time data synchronization stage
+  string stage = 2;
+
+  // Optional.
+  // topic is datatype, which specify the type of data users are going to write.
+  // in WriteOthers, topic should not be missing in request, In other cases, the topic can be omitted.
+  // The acceptable values are "user", "goods", "behavior", and "others"
+  // user: user data
+  // content: content data
+  // behavior: user event data
+  // others: It is temporarily set to "others", the specific value depends on your need.
+  string topic = 3;
+
+  // Optional.
+  // When finish user events, data_dates should not be missing
+  repeated Date data_dates = 10;
+}
+
+// Summary of error messages in imported data processing
+message DataError {
+  // Detail error message, which should be in English.
+  // Example, "An unexpected value XXX is included in the XXX field, only ["xx", "yy", "zz"] can be accepted"
+  string message = 1;
+
+  // Specific abnormal data
+  string data = 2;
+}
+
+message WriteResponse {
+  // Task execution result.
+  // when status.code is 0, no exception occurred during execution, and all writing was successful
+  Status status = 1;
+
+  // When status.code is 1206, errors has a value.
+  // Some data may fail to be processed during the writing process, and all failure information will be returned through errors.
+  // If status.code is not 0, but errors has no value, it means that all data is Write failed
+  repeated DataError errors = 2;
+}
+
+// general write request,supported import realtime data
+message WriteDataRequest{
+  // Required
+  // Id of the recommendation project.
+  string project_id = 1;
+
+  // Required
+  // The stage of importing data，Corresponding to the three synchronization stages of the recommendation platform
+  // Possible type values:
+  // "trial":Test data/pre-synchronization stage
+  // "production": Historical data synchronization stage
+  // "incremental_sync_streaming":Incremental real-time data synchronization stage
+  string stage = 2;
+
+  // Optional.
+  // topic is datatype, which specify the type of data users are going to write.
+  // in WriteOthers, topic should not be missing in request, In other cases, the topic can be omitted.
+  // The acceptable values are "user", "content", "behavior", and "others"
+  // user: user data
+  // content: content data
+  // behavior: user event data
+  // others: It is temporarily set to "others", the specific value depends on your need.
+  string topic = 3;
+
+  // Required
+  // Array of json strings. The array size is max to 2000.
+  // Each element of the array is a json serialized string of customer data.
+  repeated string data = 10;
+
+  // Optional.
+  // This is a catch-all field to pass all the additional information.
+  // Please provide as much information as possible.
+  map<string, string> extra = 100;
+}
+
+// The content proto.
+message Content {
+  // '''
+  // Required.
+  // The unique identifier for the content, can be series_id/entity_id/video_id/other unique identifier.
+  // Sample values are "12345678", "146582662088489399", etc.
+  // '''
+  string content_id = 1;
+
+  // '''
+  // Required.
+  // 1 if the content is recommendable (i.e. we can return this content in the recommendation result).
+  // 0 if the content isn't recommendable.
+  // Note:
+  //  * Even if a content isn't recommendable, please still send this to us.
+  //    This is because that users might interact with such contents historically,
+  //    therefore it provides reasonably strong signals.
+  // '''
+  int32 is_recommendable = 2;
+
+  // '''
+  // Required.
+  // Json Array, should serializer to string
+  // The categories this content belongs to.
+  // For example in origin json object, if a content has "Movie -> Comedy"
+  // This should be:
+  // [
+  //   {"category_depth":1,
+  //    "category_nodes": [{"id_or_name":"Movie"}] },
+  //   {"category_depth":2,
+  //    "category_nodes": [{"id_or_name":"Comedy"}] }
+  // ]
+  // If a content belongs to 2 different categories,
+  // "Movie -> Comedy" and "Movie -> Action"
+  // then
+  // [
+  //   {"category_depth":1,
+  //    "category_nodes": [{"id_or_name":"Movie"}] },
+  //   {"category_depth":2,
+  //    "category_nodes": [{"id_or_name":"Comedy"},
+  //                       {"id_or_name":"Action"}] }
+  // ]
+  // then you should serialize the json object to string, for example in python:
+  // categories = json.dumps( [
+  //     {"category_depth":1,
+  //      "category_nodes": [{"id_or_name":"Movie"}] },
+  //     {"category_depth":2,
+  //      "category_nodes": [{"id_or_name":"Comedy"}] }
+  //   ])
+  // '''
+  string categories = 3;
+
+  // '''
+  // Required.
+  // Type of the content.
+  // The accepted values are "picture", "gif", "video", "text", "other".
+  // Note:
+  //  * if the content_type is video, video_duration must be non-zero.
+  // '''
+  string content_type = 4;
+
+  // '''
+  // Based content_type.
+  // If content_type is video, this field is required.
+  // Provide the length this video, in milliseconds.
+  // Sample values are 1200000, etc.
+  // '''
+  int32 video_duration = 5;
+
+  // '''
+  // Optional.
+  // The content title.
+  // Sample values are "Video #1", "Titanic clip", etc.
+  // '''
+  string content_title = 6;
+
+  // '''
+  // Optional.
+  // The content description.
+  // '''
+  string description = 7;
+
+  // '''
+  // Optional.
+  // The account who created the content (i.e. the user_id) or the publisher of a video.
+  // Sample values are "1234567", "359938082141597", "665DEA957EBFB34D41B1F1D80E4B5F89" etc.
+  // '''
+  string content_owner = 8;
+
+  // '''
+  // Optional.
+  // The number of followers of the content owner.
+  // Sample values are 0, 1000, 1000000, etc.
+  // '''
+  int32 content_owner_followers = 9;
+
+  // '''
+  // Optional.
+  // The rating, if any, of this content owner.
+  // Sample values are 3.5, 98.0 etc.
+  // '''
+  float content_owner_rating = 10;
+
+  // '''
+  // Optional.
+  // The name of this content owner.
+  // Sample values are "testuser#1", etc.
+  // '''
+  string content_owner_name = 11;
+
+  // '''
+  // Optional.
+  // If this content belongs to any collection, put the collection id here.
+  // Sample values are "1234" etc.
+  // '''
+  string collection_id = 12;
+
+  // '''
+  // Optional.
+  // Json Array, should serializer to string.
+  // Internal label of this content.
+  // Sample values are "[\"New\", \"Trending\"]", etc.
+  // '''
+  string tags = 13;
+
+  // '''
+  // Optional.
+  // Json Array, should serializer to string.
+  // If this content belongs to a topic, put the tags of the topic here.
+  // Sample values are "[\"Political\", \"Latest\"]", etc.
+  // '''
+  string topic_tags = 14;
+
+  // '''
+  // Optional.
+  // Json Array, should serializer to string.
+  // Provide the url to the image file here.
+  // Sample values are "[\"https://images-na.ssl-images-amazon.com/images/I/81WmojBxvbL._AC_UL1500_.jpg\"]", etc.
+  // '''
+  string image_urls = 15;
+
+  // '''
+  // Optional.
+  // The number of images that are displayed on the detail page.
+  // Sample values are 1, 5, etc.
+  // '''
+  int32 detail_pic_num = 16;
+
+  // '''
+  // Optional.
+  // Json Array, should serializer to string.
+  // Provide the url to the video file here.
+  // Sample values are "[\"https://test_video.mov\"]", etc.
+  // '''
+  string video_urls = 17;
+
+  // '''
+  // Optional.
+  // The rating given by the users.
+  // The value is normalized to [0.0, 5.0].
+  // The accepted value range is [0.0, 5.0].
+  // '''
+  float user_rating = 18;
+
+  // '''
+  // Optional.
+  // The number of views for this content.
+  // Sample values are 10000, etc.
+  // '''
+  int32 views_count = 19;
+
+  // '''
+  // Optional.
+  // The number of comments for this content.
+  // Sample values are 100, etc.
+  // '''
+  int32 comments_count = 20;
+
+  // '''
+  // Optional.
+  // The number of likes for this content.
+  // Sample values are 10, etc.
+  // '''
+  int32 likes_count = 21;
+
+  // '''
+  // Optional.
+  // The number of shares for this content.
+  // Sample values are 50, etc.
+  // '''
+  int32 shares_count = 22;
+
+  // '''
+  // Optional.
+  // The number of saves for this content.
+  // Sample values are 50, etc.
+  // '''
+  int32 save_count = 23;
+
+  // '''
+  // Required.
+  // If this is paid_content, send the current price (after discount) in cents.
+  // e.g. $100.12 should be 10012 here.
+  // '''
+  int32 current_price = 24;
+
+  // '''
+  // Optional.
+  // If this is paid_content, send the original price (before discount) in cents
+  // e.g. $100.12 should be 10012 here.
+  // '''
+  int32 original_price = 25;
+
+  // '''
+  // Optional.
+  // Json Array, should serializer to string.
+  // The location tags of this content.
+  // Sample values are "[\"Cafe 101\"]", etc.
+  // '''
+  string available_location = 26;
+
+  // '''
+  // Optional.
+  // The timestamp that the content is published.
+  // Sample values are 1623193487, etc.
+  // '''
+  int32 publish_timestamp = 27;
+
+  // '''
+  // Optional.
+  // The timestamp that the content is updated.
+  // Sample values are 1623193487, etc.
+  // '''
+  int32 update_timestamp = 28;
+
+  // '''
+  // Optional.
+  // The timestamp when this content can be shown to users.
+  // Sample values are 1623193487, etc.
+  // '''
+  int32 copyright_start_timestamp = 29;
+
+  // '''
+  // Optional.
+  // The timestamp when this content stop being available to users.
+  // Sample values are 1623193487, etc.
+  // '''
+  int32 copyright_end_timestamp = 30;
+
+  // '''
+  // Optional.
+  // Whether this content requires payment/subscription to view.
+  // '''
+  bool is_paid_content = 31;
+
+  // '''
+  // Optional.
+  // The languages used in this content.
+  // Sample values are "English", "Chinese", etc.
+  // '''
+  string language = 32;
+
+  // '''
+  // Optional.
+  // Json Array, should serializer to string.
+  // If your platform currently provides "Related Content" recommendation, send the list of related content ids here.
+  // Sample values are "[\"12345678\",\"12345679\"]", etc.
+  // '''
+  string related_content_ids = 33;
+
+  // '''
+  // Optional.
+  // If this content requires payment, provide the number of purchases.
+  // Sample values are 100, etc.
+  // '''
+  int32 sold_count = 34;
+
+  // '''
+  // Optional.
+  // The source of the content.
+  // The accepted values are ["self", "thirdparty", "other"].
+  // '''
+  string source = 35;
+
+  // Optional.
+  // This is a catch-all field to pass all the additional information.
+  // Please provide as much information as possible.
+  map<string, string> extra = 100;
+}
+
+// The scene where the event happened.
+message Scene {
+  // Required.
+  // The unique identifier for the scene.
+  // It can be Home page, Search page, Details page, etc.
+  // It is strongly recommended that you split the scene if possible.
+  string scene_name = 1;
+
+  // Optional.
+  // The page number.
+  // It can be:
+  // 1. Users swipe the screen for X times then see the content.
+  // 2. Users go to page X and see the content.
+  // In this case, X is the page number.
+  //
+  // This should default to be 0. That means everything fits into 1 page.
+  int32 page_number = 2;
+
+  // Optional.
+  // The offset (1-based) within the page above.
+  int32 offset = 3;
+}
+
+// The device proto.
+message Device {
+  // Required.
+  // The platform used by the user.
+  // The acceptable values are "app", "desktop-web", "mobile-web", "other".
+  // app: user use APP
+  // desktop-web: user use desktop web
+  // mobile-web: user use mobile web
+  string platform = 1;
+
+  // Optional.
+  // The platform used by the user.
+  // The acceptable values are "android", "ios", "windows", "other"
+  // and "other".
+  string os_type = 2;
+
+  // Optional.
+  // Your application version.
+  // e.g. V9.0.8.
+  string app_version = 3;
+
+  // Optional.
+  // The device model.
+  // e.g. "iPhone10", "Pixel 4".
+  string device_model = 4;
+
+  // Optional.
+  // The brand of the device.
+  // e.g. "Samsung"
+  string device_brand = 5;
+
+  // Optional.
+  // The operating system version.
+  // e.g. "14.4.2"
+  string os_version = 6;
+
+  // Optional.
+  // The type of the browser.
+  // e.g. "chrome", "firefox", etc.
+  string browser_type = 7;
+
+  // Optional.
+  // The UserAgent for the browser.
+  string user_agent = 8;
+
+  // Optional.
+  // The network used.
+  // The acceptable values are "2g", "3g", "4g", "5g", "wifi", "other".
+  string network = 9;
+}
+
+// The request proto for `Predict` call.
+message PredictRequest {
+  // Required
+  // Id of the recommendation project.
+  string project_id = 1;
+
+  // Required
+  // Recommended model unique identification.
+  string model_id = 2;
+
+  // Required.
+  // This is same as `User.user_id`.
+  string user_id = 10;
+
+  // Required.
+  // The maximum number of contents returned.
+  // The actual # of contents returned is the min of:
+  // `size`
+  // length(`context.candidates_content_ids`)
+  // total # of contents with `is_recommendable=True`
+  int32 size = 11;
+
+  // Required.
+  // The scene for the recommendation.
+  Scene scene = 12;
+
+  // The context of this request.
+  message Context {
+    // Optional
+    // This is only required for content details page.
+    Content root_content = 1;
+
+    // Optional.
+    // Make sure this is as close to `UserEvent.device` as possible.
+    Device device = 2;
+
+    // Optional
+    // The list of candidates for the recommendation.
+    // If this is empty, all content are the candidates.
+    repeated Content candidate_contents = 3;
+  }
+
+  // Optional.
+  // The context of this request.
+  Context content_context = 14;
+
+  // Optional.
+  // This is a catch-all field to pass all the additional information.
+  // Please provide as much information as possible.
+  map<string, string> extra = 100;
+}
+
+// A single predict call result.
+message PredictResult {
+  // The response of a content.
+  message ResponseContent {
+    // Output only.
+    // The content id.
+    // This is consistent with `Content.content_id`.
+    string content_id = 1;
+
+    // Output only.
+    // This is the 1-based ranking of the content.
+    int32 rank = 2;
+
+    // Output only.
+    // The is the predicted CTR.
+    double pctr = 3;
+
+    // Output only.
+    // This is the predicted CVR.
+    double pcvr = 4;
+
+    // Output only.
+    // The strategy used for this particular recommendation result.
+    // Please refer to [this](../docs/ways-to-improve-recommendation-performance#use-usereventrec_info-and-usereventtraffic_source) for more details.
+    string rec_info = 5;
+
+    // Output only.
+    // All the extra debug info here.
+    map<string, string> extra = 100;
+  }
+
+  // Output only.
+  // The list of predicted content.
+  repeated ResponseContent response_contents = 1;
+
+  // Output only.
+  // Extra debug info.
+  map<string, string> extra = 100;
+}
+
+// The response proto the predict call.
+message PredictResponse {
+  // Output only.
+  // The status of the call.
+  Status status = 1;
+
+  // Output only.
+  // This is same as `PredictRequest.request_id`.
+  string request_id = 2;
+
+  // Output only.
+  // This is only populated when `PredictResponse.status.code` is not 0.
+  PredictResult content_value = 4;
+}
+
+// The request proto for AckServerImpressions call.
+message AckServerImpressionsRequest {
+  // Required
+  // Id of the recommendation project.
+  string project_id = 1;
+
+  // Required
+  // Recommended model unique identification.
+  string model_id = 2;
+
+  // Required.
+  // This should be same as `PredictRequest.request_id`.
+  string predict_request_id = 10;
+
+  // Required.
+  // This should be same as `PredictRequest.user_id`.
+  string user_id = 11;
+
+  // Required.
+  // This should be the traffic source.
+  // The acceptable values are ["self", "byteplus", "other"].
+  // Please refer to
+  // [this](../docs/ways-to-improve-recommendation-performance#use-usereventrec_info-and-usereventtraffic_source) for more details.
+  string traffic_source = 12;
+
+  // Required.
+  // The scene info.
+  // Please make sure this is as close to UserEvent.scene as possible.
+  Scene scene = 13;
+
+  // The content that was altered.
+  message AlteredContent {
+    // Required.
+    // This is same as `Content.content_id`.
+    string content_id = 1;
+
+    // Required.
+    // The final state of the content.
+    // The acceptable values are "kept", "filtered", "inserted".
+    // kept     : The content was kept as is.
+    // filtered : The content is filtered by the caller's own logic.
+    // inserted : The content is inserted by the caller's own logic.
+    string altered_reason = 2;
+
+    // Required.
+    // The final rank.
+    // If this is unset (or 0), we assume it is filtered in actual impression.
+    int32 rank = 3;
+
+    // Internal
+    // If `content_id` is a number, `content_id_hash` equals to `content_id`
+    // If `content_id` is not a number, `content_id_hash` equals to `fnv(content_id)`
+    int64 content_id_hash = 100;
+
+    // Optional.
+    // This is a catch-all field to pass all the additional information.
+    // Please provide as much information as possible.
+    map<string, string> extra = 101;
+  }
+
+  // Required.
+  // The list of altered contents.
+  repeated AlteredContent altered_contents = 15;
+
+  // Optional.
+  // This is a catch-all field to pass all the additional information.
+  // Please provide as much information as possible.
+  map<string, string> extra = 100;
+}
+
+// The response message for AckServerImpressions.
+message AckServerImpressionsResponse {
+  // Output only.
+  // The status of this response.
+  Status status = 1;
+}
+
+// The BytePlus Saas service.
+service BytePlusSaasService {
+  // Write
+  //
+  // Writes at most 2000 data at a time. Exceeding 2000 in a request results in
+  // a rejection. One can use this to upload new data, or update existing
+  // data (by providing all the fields, some data type not support update, e.g. user event).
+  rpc WritUsers(WriteDataRequest) returns (WriteResponse);
+  rpc WritContents(WriteDataRequest) returns (WriteResponse);
+  rpc WritUserEvents(WriteDataRequest) returns (WriteResponse);
+  // Byteplus Recommend premium only. Upload and write additional data to Byteplus Recommend.
+  rpc WriteOthers(WriteDataRequest) returns (WriteResponse);
+
+  // Finish
+  //
+  // Finish a certain data transfer process. Finish at most 100 data at a time.
+  // May pass a date list to mark the completion of data synchronization for these days.
+  rpc Finish(FinishWriteDataRequest) returns (WriteResponse);
+
+  // Predict
+  //
+  // Gets the list of contents (ranked).
+  // The updated user data will take effect in 24 hours.
+  // The updated content data will take effect in 30 mins.
+  // Depending how (realtime or batch) the UserEvents are sent back, it will
+  // be fed into the models and take effect after that.
+  rpc Predict(PredictRequest) returns (PredictResponse);
+
+  // AckServerImpressions
+  //
+  // Sends back the actual content list shown to the users based on the
+  // customized changes from `PredictResponse`.
+  // example: our Predict call returns the list of items [1, 2, 3, 4].
+  // Your custom logic have decided that content 3 has been sold out and
+  // content 10 needs to be inserted before 2 based on some promotion rules,
+  // the AckServerImpressionsRequest content items should looks like
+  // [
+  //   {id:1, altered_reason: "kept", rank:1},
+  //   {id:10, altered_reason: "inserted", rank:2},
+  //   {id:2, altered_reason: "kept", rank:3},
+  //   {id:4, altered_reason: "kept", rank:4},
+  //   {id:3, altered_reason: "filtered", rank:0},
+  // ].
+  rpc AckServerImpressions(AckServerImpressionsRequest) returns (AckServerImpressionsResponse);
+}

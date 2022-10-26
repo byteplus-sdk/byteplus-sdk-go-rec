@@ -1,4 +1,4 @@
-package retail
+package content
 
 import (
 	"errors"
@@ -7,7 +7,7 @@ import (
 	core "github.com/byteplus-sdk/byteplus-sdk-go-rec-core"
 	"github.com/byteplus-sdk/byteplus-sdk-go-rec-core/logs"
 	"github.com/byteplus-sdk/byteplus-sdk-go-rec-core/option"
-	"github.com/byteplus-sdk/byteplus-sdk-go-rec/retail/protocol"
+	"github.com/byteplus-sdk/byteplus-sdk-go-rec/content/protocol"
 )
 
 var (
@@ -61,10 +61,10 @@ func (c *clientImpl) WriteUsers(writeRequest *protocol.WriteDataRequest,
 	return c.doWrite(writeRequest, UserUri, opts...)
 }
 
-func (c *clientImpl) WriteProducts(writeRequest *protocol.WriteDataRequest,
+func (c *clientImpl) WriteContents(writeRequest *protocol.WriteDataRequest,
 	opts ...option.Option) (*protocol.WriteResponse, error) {
-	writeRequest.Topic = TopicProduct
-	return c.doWrite(writeRequest, ProductUri, opts...)
+	writeRequest.Topic = TopicContent
+	return c.doWrite(writeRequest, ContentUri, opts...)
 }
 
 func (c *clientImpl) WriteUserEvents(writeRequest *protocol.WriteDataRequest,
@@ -117,10 +117,10 @@ func (c *clientImpl) FinishWriteUsers(finishRequest *protocol.FinishWriteDataReq
 	return c.doFinish(finishRequest, FinishUserUri, opts...)
 }
 
-func (c *clientImpl) FinishWriteProducts(finishRequest *protocol.FinishWriteDataRequest,
+func (c *clientImpl) FinishWriteContents(finishRequest *protocol.FinishWriteDataRequest,
 	opts ...option.Option) (*protocol.WriteResponse, error) {
-	finishRequest.Topic = TopicProduct
-	return c.doFinish(finishRequest, FinishProductUri, opts...)
+	finishRequest.Topic = TopicContent
+	return c.doFinish(finishRequest, FinishContentUri, opts...)
 }
 
 func (c *clientImpl) FinishWriteUserEvents(finishRequest *protocol.FinishWriteDataRequest,

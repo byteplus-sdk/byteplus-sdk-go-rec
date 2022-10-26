@@ -1,4 +1,4 @@
-package retail
+package content
 
 const (
 	maxWriteCount  = 2000
@@ -26,31 +26,31 @@ const (
 	// TopicUser Topic if write users and finish write users
 	TopicUser = "user"
 
-	// TopicProduct Topic if write products and finish write products
-	TopicProduct = "goods"
+	// TopicContent Topic if write contents and finish write contents
+	TopicContent = "content"
 
 	// TopicUserEvent Topic if write user events and finish write user events
 	TopicUserEvent = "behavior"
 
 	// UserUri in user topic, url path is end with WriteUsers
-	UserUri = "/RetailSaaS/WriteUsers"
+	UserUri = "/ContentSaaS/WriteUsers"
 
 	// FinishUserUri The URL format of finish information
-	FinishUserUri = "/RetailSaaS/FinishWriteUsers"
+	FinishUserUri = "/ContentSaaS/FinishWriteUsers"
 
-	ProductUri = "/RetailSaaS/WriteProducts"
+	ContentUri = "/ContentSaaS/WriteContents"
 
-	FinishProductUri = "/RetailSaaS/FinishWriteProducts"
+	FinishContentUri = "/ContentSaaS/FinishWriteContents"
 
-	UserEventUri = "/RetailSaaS/WriteUserEvents"
+	UserEventUri = "/ContentSaaS/WriteUserEvents"
 
-	FinishUserEventUri = "/RetailSaaS/FinishWriteUserEvents"
+	FinishUserEventUri = "/ContentSaaS/FinishWriteUserEvents"
 
-	OthersUri = "/RetailSaaS/WriteOthers"
+	OthersUri = "/ContentSaaS/WriteOthers"
 
-	FinishOthersUri = "/RetailSaaS/FinishWriteOthers"
+	FinishOthersUri = "/ContentSaaS/FinishWriteOthers"
 
-	PredictUri = "/RetailSaaS/Predict"
+	PredictUri = "/ContentSaaS/Predict"
 
-	AckServerImpressionsUri = "/RetailSaaS/AckServerImpressions"
+	AckServerImpressionsUri = "/ContentSaaS/AckServerImpressions"
 )

@@ -22,6 +22,9 @@ message Status {
 
   // Output only. Detailed error message.
   string message = 2;
+
+  // Output only. success mark
+  bool success = 3;
 }
 
 // Represents a whole or partial calendar date, such as a birthday. The time of
