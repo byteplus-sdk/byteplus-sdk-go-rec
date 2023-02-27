@@ -118,3 +118,7 @@ Temporary Items
 
 go.sum
 .idea/
+
+/node_modules
+package*.json
+

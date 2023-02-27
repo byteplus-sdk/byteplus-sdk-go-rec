@@ -20,7 +20,7 @@ import (
 var client sdk.Client
 
 func init() {
-	sdklog.Level = logs.LevelDebug
+	sdklog.Level = sdklog.LevelDebug
 	var err error
 	client, err = sdk.NewClientBuilder().
 		TenantID("***********"). // Required. The account id of byteplus.
@@ -53,7 +53,7 @@ import (
 var client sdk.Client
 
 func init() {
-	sdklog.Level = logs.LevelDebug
+	sdklog.Level = sdklog.LevelDebug
 	var err error
 	client, err = sdk.NewClientBuilder().
 		TenantID("***********"). // Required. The account id of byteplus.
@@ -96,4 +96,5 @@ go build
 #### For more details
 * [Saas E-Commerce Code Sample](https://docs.byteplus.com/recommend/docs/code-samples)
 * [Saas E-Commerce API Reference](https://docs.byteplus.com/recommend/reference/byteplussaasservice_writusers-2)
+* [Saas Content Code Sample](https://docs.byteplus.com/recommend/docs/content-code-samples)
 * [Saas Content API Reference](https://docs.byteplus.com/recommend/reference/byteplussaasservice_writusers)
