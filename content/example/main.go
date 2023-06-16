@@ -71,8 +71,9 @@ func init() {
 		AccountID("***********"). // Required. The account id of byteplus.
 		ProjectID(projectID).
 		Region(region.SG).     // Required. The region of the server used to provide service.
-		AuthAK("***********"). // Required. Access Key, used to generate request signature.
-		AuthSK("***********"). // Required. Secure key, used to generate request signature.
+		AuthAK("***********"). // Required. Access Key, used to generate request signature. Saas Standard projects should use.
+		AuthSK("***********"). // Required. Secure key, used to generate request signature. Saas Standard projects should use.
+		// AirAuthToken("***********"). // Required. The token of this project. Saas Premium projects should use.
 		//KeepAlive(true). // Optional.
 		//CallerConfig(callerConfig). // Optional.
 		//MetricsConfig(metricsConfig). // Optional.
