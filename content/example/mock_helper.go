@@ -53,7 +53,7 @@ func mockProduct() *DemoContent {
 		VideoDuration:    120000,
 		ContentTitle:     "Green Book Movie Explanation",
 		Description:      "A brief summary of the main content of the Green Book movie",
-		ContentOwner:     "1457789",
+		ContentOwnerId:   "1457789",
 		CollectionId:     "1342",
 		Tags:             `["New","Trending"]`,                                                               // Json Array, use json.Marshal().
 		ImageUrls:        `["https://images-na.ssl-images-amazon.com/images/I/81WmojBxvbL._AC_UL1500_.jpg"]`, // Json Array, use json.Marshal().

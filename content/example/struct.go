@@ -24,7 +24,7 @@ type DemoContent struct {
 	VideoDuration    int32   `json:"video_duration,omitempty"`
 	ContentTitle     string  `json:"content_title,omitempty"`
 	Description      string  `json:"description,omitempty"`
-	ContentOwner     string  `json:"content_owner,omitempty"`
+	ContentOwnerId   string  `json:"content_owner_id,omitempty"`
 	CollectionId     string  `json:"collection_id,omitempty"`
 	Tags             string  `json:"tags,omitempty"`       // json array
 	ImageUrls        string  `json:"image_urls,omitempty"` // json array
