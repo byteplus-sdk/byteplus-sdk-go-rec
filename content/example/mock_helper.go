@@ -113,44 +113,7 @@ func mockUserEvent() *DemoUserEvent {
 
 func mockPredictContent() *protocol.Content {
 	return &protocol.Content{
-		ContentId:               "632461",
-		IsRecommendable:         1,
-		Categories:              `[{"category_depth":1,"category_nodes":[{"id_or_name":"Movie"}]},{"category_depth":2,"category_nodes":[{"id_or_name":"Comedy"}]}]`, // Json Array, use json.Marshal().
-		ContentType:             "video",
-		VideoDuration:           120000,
-		ContentTitle:            "Green Book Movie Explanation",
-		Description:             "A brief summary of the main content of the Green Book movie",
-		ContentOwner:            "1457789",
-		ContentOwnerFollowers:   25,
-		ContentOwnerRating:      4.5,
-		ContentOwnerName:        "comedy movie commentary",
-		CollectionId:            "1342",
-		Tags:                    `["New","Trending"]`,                                                               // Json Array, use json.Marshal().
-		TopicTags:               `["Political","Latest"]`,                                                           // Json Array, use json.Marshal().
-		ImageUrls:               `["https://images-na.ssl-images-amazon.com/images/I/81WmojBxvbL._AC_UL1500_.jpg"]`, // Json Array, use json.Marshal().
-		DetailPicNum:            5,
-		VideoUrls:               `["https://test_video.mov"]`, // Json Array, use json.Marshal().
-		UserRating:              4.9,
-		ViewsCount:              10000,
-		CommentsCount:           100,
-		LikesCount:              10,
-		SharesCount:             50,
-		SaveCount:               50,
-		CurrentPrice:            1300,
-		OriginalPrice:           1600,
-		AvailableLocation:       `["Cafe 101"]`, // Json Array, use json.Marshal().
-		PublishTimestamp:        1660035734,
-		UpdateTimestamp:         1660035734,
-		CopyrightStartTimestamp: 1660035734,
-		CopyrightEndTimestamp:   1760035734,
-		IsPaidContent:           true,
-		Language:                "English",
-		RelatedContentIds:       `["632462","632463"]`, // Json Array, use json.Marshal().
-		SoldCount:               60,
-		Source:                  "self",
-		//Extra: map[string]string{
-		//	"additionalField": "additionalValue",
-		//},
+		ContentId: "632461",
 	}
 }
 

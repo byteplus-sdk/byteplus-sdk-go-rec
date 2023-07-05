@@ -88,29 +88,30 @@ message Product {
   // [link to best practices on deciding product ids](./ways-to-improve-recommendation-performance)
   string product_id = 1;
 
-  // The category proto.
-  message Category {
-    // Required.
-    // The depth of the category.
-    // This is consecutive (1-based) and ascending.
-    int32 category_depth = 1;
+  // Optional.
+  // 1 if the product is recommendable (i.e. to return the product in the recommendation result).
+  // Note: Even if a product isn't recommendable, please include it still.
+  // the is because that users might have interacted with such product in the past, hence providing insights into behavioural propensities.
+  int32 is_recommendable = 2;
 
-    // The single node of the category.
-    message CategoryNode {
+  // Optional.
+  // The current/displayed/discounted price of the product. Round to 2.d.p.
+  float current_price = 3;
 
-      // Required.
-      // The unique identifier of the category.
-      string id_or_name = 1;
-    }
+  // Optional.
+  // The original price of the product. Round to 2.d.p.
+  float original_price = 4;
 
-    // Required.
-    // The category nodes belong to the same depth.
-    repeated CategoryNode category_nodes = 2;
-  }
+  // Optional.
+  // The timestamp when the product was published.
+  int64 publish_timestamp = 5;
 
-  // Required.
-  // The categorical information of the product.
-  // Missing this will significantly hurt the performance.
+  // Optional.
+  // The (sub)categories the content fall under. Format requirements:
+  //  1. JSON serialised string
+  //  2. Depth starts from 1, in consecutive postive integers
+  //  3. "Category_nodes" should not contain empty value. If empty value exists, replace with "null" .
+  //  4. Only one "id_or_name" key-value pair is allowed under each "category_nodes"
   // For example, if a product has "Shoes -> Men's Shoes -> Basketball Shoes"
   // This should be:
   // [
@@ -133,159 +134,57 @@ message Product {
   //    "category_nodes": [{"id_or_name":"Men's shoes"},
   //                       {"id_or_name":"Basketball"}] },
   // ]
-  repeated Category categories = 2;
+  string categories = 6;
 
-  // The brand proto.
-  message Brand {
-    // Required.
-    // The brand depth. This is consecutive (1-based) and ascending.
-    int32 brand_depth = 1;
+  // Optional.
+  // The (internal) label of the product. Format into JSON serialized string.
+  // Sample values are: "[\"New\", \"Summer\", \"Clearance\"]", etc.
+  string tags = 7;
 
-    // Required.
-    // The id or name of the brand at this depth.
-    string id_or_name = 2;
-  }
+  // Optional.
+  // The title/name of the product.
+  string title = 8;
+
+  // Optional.
+  // The brand of the product.
+  string brands = 9;
+
+  // Optional.
+  // The rating given by the users. Non-negative value.
+  float user_rating = 10;
+
+  // Optional.
+  // The number of sales of the content if it is paid content.
+  int32 sold_count = 11;
+
+  // Optional.
+  // The ID of the group/unit for products with common characteristics.
+  string product_group_id = 12;
+
+  // Optional.
+  // The URL of the cover multimedia for the product. Format into JSON serialized string.
+  string display_cover_multimedia_url = 13;
+
+  // Optional.
+  // The number of comments of the content.
+  int32 comment_count = 14;
+
+  // Optional.
+  // The source of the product..
+  // For example, "self", "thirdparty", "other".
+  string source = 15;
 
   // Required.
-  // Missing this will significantly hurt the performance.
-  // The order should be asending on depth.
-  // For example, if a product belongs to "Adidas -> Yeezy",
-  // this field should be:
-  // [
-  //   {"brand_depth": 1, "id_or_name":"Adidas"},
-  //   {"brand_depth": 2, "id_or_name":"Yeezy"},
-  // ]
-  repeated Brand brands = 3;
-
-  // The price proto.
-  // Please make sure the products that need to be ranked together
-  // have the same currency.
-  message Price {
-    // Required.
-    // The current price in cents.
-    // e.g. $100.12 should be 10012 here.
-    int64 current_price = 1;
-
-    // Required.
-    // The original price in cents.
-    // e.g. $100.12 should be 10012 here.
-    int64 origin_price = 2;
-  }
-
-  // Required.
-  // The product price info.
-  // Please make sure the accuracy and recency.
-  Price price = 4;
-
-  // Required.
-  // 1 if the product is recommendable (result in `Predict` call).
-  // 0 if the product isn't recommendable..
-  // Note: Any change of this takes up to 1 hour to take effect.
-  // Note: Even if a product isn't recommendable, please still send this to us.
-  // This is because that users might interact with such products historically,
-  // therefore it provides reasonably strong signals.
-  int32 is_recommendable = 5;
-
-  // Required.
-  // The product title.
-  string title = 6;
+  // The ID of the seller.
+  string seller_id = 16;
 
   // Optional.
-  // The product quality score.
-  // Note: this is different than user ratings.
-  // It is normally computed as a composite score considering many factors,
-  // including sales, customer feedback, information completeness, etc.
-  // This score should be normalized to [1.0, 5.0]
-  double quality_score = 7;
+  // The tier/level of the seller.
+  string seller_level = 17;
 
   // Optional.
-  // The tags given by the seller for this product.
-  // This is used to lift the performance.
-  // Sample values are: "New", "Summer", "Clearance", etc.
-  repeated string tags = 8;
-
-  // The product display information.
-  message Display {
-    // Optional.
-    // The tags visible to the users on the listing page.
-    // Please fill as much as possible.
-    // Sample values are: "best seller", "hot sales", etc.
-    repeated string listing_page_display_tags = 1;
-
-    // Optional.
-    // The tags visible in the details page.
-    // Please fill as much as possible.
-    // Sample values are: "free shipping", "1 year guarantee", etc
-    repeated string detail_page_display_tags = 2;
-
-    // Optional.
-    // The product display media type in ths listing page.
-    // The only acceptable values are ["image", "video", "other"].
-    string listing_page_display_type = 3;
-
-    // Optional.
-    // When `listing_page_display_type` is one of the multi-media types,
-    // put the url here.
-    string cover_multimedia_url = 4;
-  }
-
-  // Optional.
-  // The display information of the product.
-  Display display = 9;
-
-  // The detailed product specs.
-  message ProductSpec {
-
-    // Required.
-    // The product group id.
-    // For example, the beer (same brand) might have 6-pack, 12-pack, etc,
-    // each has a different `product_id`, then they should have the
-    // `same product_group_id`
-    string product_group_id = 1;
-
-    // Optional.
-    // The rating given by the users.
-    // The value is normalized to [0.0, 5.0].
-    double user_rating = 2;
-
-    // Optional.
-    // The # of comments for this product.
-    int32 comment_count = 3;
-
-    // Optional.
-    // The source of the product.
-    // The accepted values are ["self", "thirdparty", "other"].
-    string source = 4;
-
-    // Optional.
-    // The time that the product is on sales.
-    int64 publish_timestamp = 5;
-  }
-
-  // Optional.
-  // The product specs.
-  ProductSpec product_spec = 10;
-
-  // Seller info.
-  message Seller {
-    // Required.
-    // The id for the seller.
-    string id = 1;
-
-    // Optional.
-    // The seller's level.
-    // The sample values are "gold", "silver", etc.
-    string seller_level = 2;
-
-    // Optional.
-    // The seller's rating.
-    // Normalized to [0.0, 5.0].
-    double seller_rating = 3;
-  }
-
-  // Optional.
-  // The seller proto.
-  Seller seller = 11;
+  // The seller's rating given by the customers. Non-negative value.
+  float seller_rating = 21;
 
   // Optional.
   // This is a catch-all field to pass all the additional information.
@@ -467,6 +366,14 @@ message PredictRequest {
     // The list of candidates for the recommendation.
     // If this is empty, all products are the candidates.
     repeated Product candidate_products = 4;
+
+    // Optional.
+    // Online feature, Saas Premium projects maybe use.
+    PredictFeature feature = 5;
+
+    // Optional.
+    // Dynamic filter, Saas Premium projects maybe use.
+    PredictFilter filter = 6;
   }
 
   // Optional.
@@ -477,6 +384,58 @@ message PredictRequest {
   // This is a catch-all field to pass all the additional information.
   // Please provide as much information as possible.
   map<string, string> extra = 100;
+}
+
+message PredictFeature {
+  map<string, string> string_feature = 1;
+
+  map<string, int64> int_feature = 2;
+
+  map<string, float> float_feature = 3;
+
+  map<string, double> double_feature = 4;
+
+  map<string, StringArray> string_array_feature = 5;
+
+  map<string, IntArray> int_array_feature = 6;
+
+  map<string, FloatArray> float_array_feature = 7;
+
+  map<string, DoubleArray> double_array_feature = 8;
+}
+
+message PredictFilter {
+  map<string, string> string_filter = 1;
+
+  map<string, int64> int_filter = 2;
+
+  map<string, float> float_filter = 3;
+
+  map<string, double> double_filter = 4;
+
+  map<string, StringArray> string_array_filter = 5;
+
+  map<string, IntArray> int_array_filter = 6;
+
+  map<string, FloatArray> float_array_filter = 7;
+
+  map<string, DoubleArray> double_array_filter = 8;
+}
+
+message StringArray {
+  repeated string values = 1;
+}
+
+message IntArray {
+  repeated int64 values = 1;
+}
+
+message FloatArray {
+  repeated float values = 1;
+}
+
+message DoubleArray {
+  repeated double values = 1;
 }
 
 // A single predict call result.

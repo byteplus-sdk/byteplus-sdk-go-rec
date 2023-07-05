@@ -107,69 +107,8 @@ func mockUserEvent() *DemoUserEvent {
 }
 
 func mockPredictProduct() *protocol.Product {
-	category1Node1 := &protocol.Product_Category_CategoryNode{
-		IdOrName: "Shoes",
-	}
-	category1 := &protocol.Product_Category{
-		CategoryDepth: 1,
-		CategoryNodes: []*protocol.Product_Category_CategoryNode{category1Node1},
-	}
-	category2Node1 := &protocol.Product_Category_CategoryNode{
-		IdOrName: "Men's Shoes",
-	}
-	category2 := &protocol.Product_Category{
-		CategoryDepth: 2,
-		CategoryNodes: []*protocol.Product_Category_CategoryNode{category2Node1},
-	}
-
-	brand1 := &protocol.Product_Brand{
-		BrandDepth: 1,
-		IdOrName:   "Adidas",
-	}
-	brand2 := &protocol.Product_Brand{
-		BrandDepth: 2,
-		IdOrName:   "Yeezy",
-	}
-
-	price := &protocol.Product_Price{
-		CurrentPrice: 49900,
-		OriginPrice:  69900,
-	}
-
-	display := &protocol.Product_Display{
-		DetailPageDisplayTags:  []string{"FreeShipping", "Return in 7 days without any reasons"},
-		ListingPageDisplayTags: []string{"best seller", "hot sales"},
-		ListingPageDisplayType: "image",
-		CoverMultimediaUrl:     "https://images-na.ssl-images-amazon.com/images/I/81WmojBxvbL._AC_UL1500_.jpg",
-	}
-
-	spec := &protocol.Product_ProductSpec{
-		ProductGroupId:   "1356",
-		UserRating:       0.25,
-		CommentCount:     100,
-		Source:           "self",
-		PublishTimestamp: 1623193487,
-	}
-
-	seller := &protocol.Product_Seller{
-		Id:           "43485",
-		SellerLevel:  "1",
-		SellerRating: 3.5,
-	}
-
 	return &protocol.Product{
-		ProductId:       "632461",
-		Categories:      []*protocol.Product_Category{category1, category2},
-		Brands:          []*protocol.Product_Brand{brand1, brand2},
-		Price:           price,
-		IsRecommendable: 1,
-		Title:           "adidas Men's Yeezy Boost 350 V2 Grey/Borang/Dgsogr",
-		QualityScore:    4.4,
-		Tags:            []string{"New Product", "Summer Product"},
-		Display:         display,
-		ProductSpec:     spec,
-		Seller:          seller,
-		Extra:           map[string]string{"count": "20", "color": "white"},
+		ProductId: "632461",
 	}
 }
 
