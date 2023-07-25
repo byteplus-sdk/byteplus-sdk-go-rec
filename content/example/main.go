@@ -48,6 +48,8 @@ func init() {
 	//	KeepAliveDuration: 60 * time.Second,
 	//	// Only takes effect when contentClient.keepAlive(true), heartbeat packet sending interval.
 	//	KeepAlivePingInterval: 45 * time.Second,
+	//	// Default is 512. The maximum number of connections for a single host, if the maximum number of connections is exceeded, an error will be reported.
+	//	MaxConnections: 512,
 	//}
 	//
 	//// Metrics configuration, when Metrics and Metrics Log are turned on,
