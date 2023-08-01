@@ -26,9 +26,9 @@ func init() {
 		TenantID("***********"). // Required. The account id of byteplus.
 		ProjectID("*************").
 		Region(region.SG). // Required. The region of the server used to provide service.
-        AuthAK("***********"). // Required. Access Key, used to generate request signature. Saas Standard project use this.
-        AuthSK("***********"). // Required. Secure key, used to generate request signature. Saas Standard project use this.
-        // AirAuthToken("***********"). // Required. The token of this project. Saas Premium project use this.
+        AuthAK("***********"). // Required. Access Key, used to generate request signature. Saas Standard projects should use.
+        AuthSK("***********"). // Required. Secure key, used to generate request signature. Saas Standard projects should use.
+        // AirAuthToken("***********"). // Required. The token of this project. Saas Premium projects should use.
 		//Schema("https"). // Optional.
 		//Hosts([]string{"rec-api-sg1.recplusapi.com"}). // Optional.
 		Build()

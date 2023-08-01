@@ -139,28 +139,34 @@ message WriteDataRequest{
 
 // The content proto.
 message Content {
-  // '''
   // Required.
   // The unique identifier for the content, can be series_id/entity_id/video_id/other unique identifier.
-  // Sample values are "12345678", "146582662088489399", etc.
-  // '''
   string content_id = 1;
 
-  // '''
-  // Required.
-  // 1 if the content is recommendable (i.e. we can return this content in the recommendation result).
-  // 0 if the content isn't recommendable.
-  // Note:
-  //  * Even if a content isn't recommendable, please still send this to us.
-  //    This is because that users might interact with such contents historically,
-  //    therefore it provides reasonably strong signals.
-  // '''
-  int32 is_recommendable = 2;
+  // Optional.
+  // The type of the content. .
+  string content_type = 2;
 
-  // '''
-  // Required.
-  // Json Array, should serializer to string
-  // The categories this content belongs to.
+  // Optional.
+  // 1 if the content is recommendable (i.e. to return the content in the recommendation result).
+  // Note: Even if a content isn't recommendable, please include it still.
+  // the is because that users might have interacted with such content in the past, hence providing insights into behavioural propensities.
+  int32 is_recommendable = 3;
+
+  // Optional.
+  // The languages used in the content.
+  string language = 4;
+
+  // Optional.
+  // The title of the content.
+  string content_title = 5;
+
+  // Optional.
+  // The (sub)categories the content fall under. Format requirements:
+  //  1. JSON serialised string.
+  //  2. Depth starts from 1, in consecutive postive integers.
+  //  3. "Category_nodes" should not contain empty value. If empty value exists, replace with "null" .
+  //  4. Only one "id_or_name" key-value pair is allowed under each "category_nodes".
   // For example in origin json object, if a content has "Movie -> Comedy"
   // This should be:
   // [
@@ -186,240 +192,65 @@ message Content {
   //     {"category_depth":2,
   //      "category_nodes": [{"id_or_name":"Comedy"}] }
   //   ])
-  // '''
-  string categories = 3;
+  string categories = 6;
 
-  // '''
-  // Required.
-  // Type of the content.
-  // The accepted values are "picture", "gif", "video", "text", "other".
-  // Note:
-  //  * if the content_type is video, video_duration must be non-zero.
-  // '''
-  string content_type = 4;
-
-  // '''
-  // Based content_type.
-  // If content_type is video, this field is required.
-  // Provide the length this video, in milliseconds.
-  // Sample values are 1200000, etc.
-  // '''
-  int32 video_duration = 5;
-
-  // '''
   // Optional.
-  // The content title.
-  // Sample values are "Video #1", "Titanic clip", etc.
-  // '''
-  string content_title = 6;
-
-  // '''
-  // Optional.
-  // The content description.
-  // '''
-  string description = 7;
-
-  // '''
-  // Optional.
-  // The account who created the content (i.e. the user_id) or the publisher of a video.
-  // Sample values are "1234567", "359938082141597", "665DEA957EBFB34D41B1F1D80E4B5F89" etc.
-  // '''
-  string content_owner = 8;
-
-  // '''
-  // Optional.
-  // The number of followers of the content owner.
-  // Sample values are 0, 1000, 1000000, etc.
-  // '''
-  int32 content_owner_followers = 9;
-
-  // '''
-  // Optional.
-  // The rating, if any, of this content owner.
-  // Sample values are 3.5, 98.0 etc.
-  // '''
-  float content_owner_rating = 10;
-
-  // '''
-  // Optional.
-  // The name of this content owner.
-  // Sample values are "testuser#1", etc.
-  // '''
-  string content_owner_name = 11;
-
-  // '''
-  // Optional.
-  // If this content belongs to any collection, put the collection id here.
-  // Sample values are "1234" etc.
-  // '''
-  string collection_id = 12;
-
-  // '''
-  // Optional.
-  // Json Array, should serializer to string.
-  // Internal label of this content.
+  // The (internal) label of the content. Format into JSON serialized string.
   // Sample values are "[\"New\", \"Trending\"]", etc.
-  // '''
-  string tags = 13;
+  string tags = 7;
 
-  // '''
   // Optional.
-  // Json Array, should serializer to string.
-  // If this content belongs to a topic, put the tags of the topic here.
-  // Sample values are "[\"Political\", \"Latest\"]", etc.
-  // '''
-  string topic_tags = 14;
+  // The ID of the colllection, if any, to which the content belongs.
+  string collection_id = 8;
 
-  // '''
   // Optional.
-  // Json Array, should serializer to string.
-  // Provide the url to the image file here.
-  // Sample values are "[\"https://images-na.ssl-images-amazon.com/images/I/81WmojBxvbL._AC_UL1500_.jpg\"]", etc.
-  // '''
+  // The timestamp when the content was published.
+  int64 publish_timestamp = 9;
+
+  // Optional.
+  // The user_id of the content creator.
+  string content_owner_id = 10;
+
+  // Optional.
+  // The length of the video in milliseconds.
+  int32 video_duration = 11;
+
+  // Optional.
+  // The detailed description of the content.
+  string description = 12;
+
+  // Optional.
+  // The product_id of the goods sold via the content.
+  string linked_product_id = 13;
+
+  // Optional.
+  // The URL of the video. Format into JSON serialized string.
+  string video_urls = 14;
+
+  // Optional.
+  // The URL of the image (e.g. thumbnail). Format into JSON serialized string.
   string image_urls = 15;
 
-  // '''
   // Optional.
-  // The number of images that are displayed on the detail page.
-  // Sample values are 1, 5, etc.
-  // '''
-  int32 detail_pic_num = 16;
+  // The rating of the content. Non-negative value.
+  float user_rating = 16;
 
-  // '''
   // Optional.
-  // Json Array, should serializer to string.
-  // Provide the url to the video file here.
-  // Sample values are "[\"https://test_video.mov\"]", etc.
-  // '''
-  string video_urls = 17;
+  // True if the content requires payment/subscription to view
+  bool is_paid_content = 17;
 
-  // '''
-  // Optional.
-  // The rating given by the users.
-  // The value is normalized to [0.0, 5.0].
-  // The accepted value range is [0.0, 5.0].
-  // '''
-  float user_rating = 18;
-
-  // '''
-  // Optional.
-  // The number of views for this content.
-  // Sample values are 10000, etc.
-  // '''
-  int32 views_count = 19;
-
-  // '''
-  // Optional.
-  // The number of comments for this content.
-  // Sample values are 100, etc.
-  // '''
-  int32 comments_count = 20;
-
-  // '''
-  // Optional.
-  // The number of likes for this content.
-  // Sample values are 10, etc.
-  // '''
-  int32 likes_count = 21;
-
-  // '''
-  // Optional.
-  // The number of shares for this content.
-  // Sample values are 50, etc.
-  // '''
-  int32 shares_count = 22;
-
-  // '''
-  // Optional.
-  // The number of saves for this content.
-  // Sample values are 50, etc.
-  // '''
-  int32 save_count = 23;
-
-  // '''
-  // Required.
-  // If this is paid_content, send the current price (after discount) in cents.
-  // e.g. $100.12 should be 10012 here.
-  // '''
-  int32 current_price = 24;
-
-  // '''
-  // Optional.
-  // If this is paid_content, send the original price (before discount) in cents
-  // e.g. $100.12 should be 10012 here.
-  // '''
-  int32 original_price = 25;
-
-  // '''
-  // Optional.
-  // Json Array, should serializer to string.
-  // The location tags of this content.
-  // Sample values are "[\"Cafe 101\"]", etc.
-  // '''
-  string available_location = 26;
-
-  // '''
-  // Optional.
-  // The timestamp that the content is published.
-  // Sample values are 1623193487, etc.
-  // '''
-  int32 publish_timestamp = 27;
-
-  // '''
-  // Optional.
-  // The timestamp that the content is updated.
-  // Sample values are 1623193487, etc.
-  // '''
-  int32 update_timestamp = 28;
-
-  // '''
-  // Optional.
-  // The timestamp when this content can be shown to users.
-  // Sample values are 1623193487, etc.
-  // '''
-  int32 copyright_start_timestamp = 29;
-
-  // '''
-  // Optional.
-  // The timestamp when this content stop being available to users.
-  // Sample values are 1623193487, etc.
-  // '''
-  int32 copyright_end_timestamp = 30;
-
-  // '''
-  // Optional.
-  // Whether this content requires payment/subscription to view.
-  // '''
-  bool is_paid_content = 31;
-
-  // '''
-  // Optional.
-  // The languages used in this content.
-  // Sample values are "English", "Chinese", etc.
-  // '''
-  string language = 32;
-
-  // '''
-  // Optional.
-  // Json Array, should serializer to string.
-  // If your platform currently provides "Related Content" recommendation, send the list of related content ids here.
-  // Sample values are "[\"12345678\",\"12345679\"]", etc.
-  // '''
-  string related_content_ids = 33;
-
-  // '''
-  // Optional.
-  // If this content requires payment, provide the number of purchases.
-  // Sample values are 100, etc.
-  // '''
-  int32 sold_count = 34;
-
-  // '''
   // Optional.
   // The source of the content.
-  // The accepted values are ["self", "thirdparty", "other"].
-  // '''
-  string source = 35;
+  // For example, "self", "thirdparty", "other".
+  string source = 18;
+
+  // Optional.
+  // The price (after discount) of the content in cents if it is paid content.
+  float current_price = 19;
+
+  // Optional.
+  // The price (before discount) of the content in cents if it is paid content.
+  float original_price = 20;
 
   // Optional.
   // This is a catch-all field to pass all the additional information.
@@ -541,6 +372,14 @@ message PredictRequest {
     // The list of candidates for the recommendation.
     // If this is empty, all content are the candidates.
     repeated Content candidate_contents = 3;
+
+    // Optional.
+    // Online feature, Saas Premium projects maybe use.
+    PredictFeature feature = 4;
+
+    // Optional.
+    // Dynamic filter, Saas Premium projects maybe use.
+    PredictFilter filter = 5;
   }
 
   // Optional.
@@ -551,6 +390,58 @@ message PredictRequest {
   // This is a catch-all field to pass all the additional information.
   // Please provide as much information as possible.
   map<string, string> extra = 100;
+}
+
+message PredictFeature {
+  map<string, string> string_feature = 1;
+
+  map<string, int64> int_feature = 2;
+
+  map<string, float> float_feature = 3;
+
+  map<string, double> double_feature = 4;
+
+  map<string, StringArray> string_array_feature = 5;
+
+  map<string, IntArray> int_array_feature = 6;
+
+  map<string, FloatArray> float_array_feature = 7;
+
+  map<string, DoubleArray> double_array_feature = 8;
+}
+
+message PredictFilter {
+  map<string, string> string_filter = 1;
+
+  map<string, int64> int_filter = 2;
+
+  map<string, float> float_filter = 3;
+
+  map<string, double> double_filter = 4;
+
+  map<string, StringArray> string_array_filter = 5;
+
+  map<string, IntArray> int_array_filter = 6;
+
+  map<string, FloatArray> float_array_filter = 7;
+
+  map<string, DoubleArray> double_array_filter = 8;
+}
+
+message StringArray {
+  repeated string values = 1;
+}
+
+message IntArray {
+  repeated int64 values = 1;
+}
+
+message FloatArray {
+  repeated float values = 1;
+}
+
+message DoubleArray {
+  repeated double values = 1;
 }
 
 // A single predict call result.
