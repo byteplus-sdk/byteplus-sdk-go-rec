@@ -1,3 +1,17 @@
+## [0.1.9](https://github.com/byteplus-sdk/byteplus-sdk-go-rec/compare/v0.1.8...v0.1.9) (2023-08-28)
+
+
+### Bug Fixes
+
+* fix ci pipelines 
+
+
+### Features
+
+* update version 
+
+
+
 ## [0.1.8](https://github.com/byteplus-sdk/byteplus-sdk-go-rec/compare/v0.1.7...v0.1.8) (2023-08-01)
 
 
