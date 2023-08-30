@@ -96,7 +96,7 @@ go build
 ```
 
 #### For more details
-* [Saas E-Commerce Code Sample](https://docs.byteplus.com/recommend/docs/code-samples)
-* [Saas E-Commerce API Reference](https://docs.byteplus.com/recommend/reference/byteplussaasservice_writusers-2)
-* [Saas Content Code Sample](https://docs.byteplus.com/recommend/docs/content-code-samples)
-* [Saas Content API Reference](https://docs.byteplus.com/recommend/reference/byteplussaasservice_writusers)
+* [Saas E-Commerce Code Sample](https://docs.byteplus.com/en/recommend/samples/retail_code_samples)
+* [Saas E-Commerce API Reference](https://docs.byteplus.com/en/recommend/reference/retail_saas_writeusers)
+* [Saas Content Code Sample](https://docs.byteplus.com/en/recommend/samples/content_code_samples)
+* [Saas Content API Reference](https://docs.byteplus.com/en/recommend/reference/content_saas_writeusers)
