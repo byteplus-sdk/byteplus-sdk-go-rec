@@ -530,7 +530,7 @@ message AckServerImpressionsRequest {
 
     // Required.
     // The final state of the product.
-    // The acceptable values are "kept", "filtered", "inserted".
+    // The acceptable values are "kept", "filtered", "inserted", "filled".
     // kept     : The product was kept as is.
     // filtered : The product is filtered by the caller's own logic.
     // inserted : The product is inserted by the caller's own logic.
