@@ -534,6 +534,7 @@ message AckServerImpressionsRequest {
     // kept     : The product was kept as is.
     // filtered : The product is filtered by the caller's own logic.
     // inserted : The product is inserted by the caller's own logic.
+    // filled   : The product is filled by the caller's own logic.
     string altered_reason = 2;
 
     // Required.
