@@ -537,10 +537,11 @@ message AckServerImpressionsRequest {
 
     // Required.
     // The final state of the content.
-    // The acceptable values are "kept", "filtered", "inserted".
+    // The acceptable values are "kept", "filtered", "inserted", "filled".
     // kept     : The content was kept as is.
     // filtered : The content is filtered by the caller's own logic.
     // inserted : The content is inserted by the caller's own logic.
+    // filled   : The content is filled by the caller's own logic.
     string altered_reason = 2;
 
     // Required.
