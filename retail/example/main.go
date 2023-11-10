@@ -81,6 +81,7 @@ func init() {
 		//MetricsConfig(metricsConfig). // Optional.
 		//Schema("https"). // Optional.
 		//Hosts([]string{"rec-api-sg1.recplusapi.com"}). // Optional.
+		//MainHost("xxx.xxx.com").                     // Optional. Set one of the hosts set by '.hosts()' as the primary one.
 		Build()
 	if err != nil {
 		panic(fmt.Sprintf("byteplus rec sdk init err:%s", err.Error()))

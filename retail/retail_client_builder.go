@@ -15,6 +15,7 @@ type clientBuilder struct {
 	authAK                string
 	authSK                string
 	schema                string
+	mainHost              string
 	hosts                 []string
 	region                core.IRegion
 	callerConfig          *core.CallerConfig
@@ -67,6 +68,11 @@ func (receiver *clientBuilder) Hosts(hosts []string) *clientBuilder {
 	return receiver
 }
 
+func (receiver *clientBuilder) MainHost(host string) *clientBuilder {
+	receiver.mainHost = host
+	return receiver
+}
+
 func (receiver *clientBuilder) Region(region core.IRegion) *clientBuilder {
 	receiver.region = region
 	return receiver
@@ -110,6 +116,7 @@ func (receiver *clientBuilder) Build() (Client, error) {
 		AuthSK(receiver.authSK).
 		Schema(receiver.schema).
 		Hosts(receiver.hosts).
+		MainHost(receiver.mainHost).
 		Region(receiver.region).
 		AuthService(byteplusAuthService).
 		CallerConfig(receiver.callerConfig).
