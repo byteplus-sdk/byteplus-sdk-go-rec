@@ -1,4 +1,8 @@
-# [](https://github.com/byteplus-sdk/byteplus-sdk-go-rec/compare/v0.1.9...v) (2023-11-10)
+# [](https://github.com/byteplus-sdk/byteplus-sdk-go-rec/compare/v0.1.10...v) (2023-11-10)
+
+
+
+## [0.1.10](https://github.com/byteplus-sdk/byteplus-sdk-go-rec/compare/v0.1.9...v0.1.10) (2023-11-10)
 
 
 ### Bug Fixes
@@ -10,6 +14,7 @@
 ### Features
 
 * change example desc 
+* support set mainhost 
 * support set mainhost 
 
 
