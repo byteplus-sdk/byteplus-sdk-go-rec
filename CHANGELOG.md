@@ -14,8 +14,7 @@
 ### Features
 
 * change example desc 
-* support set mainhost 
-* support set mainhost 
+* support set mainhost
 
 
 
