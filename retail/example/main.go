@@ -400,12 +400,22 @@ func buildPredictRequest() *protocol.PredictRequest {
 		Device:            device,
 		CandidateProducts: []*protocol.Product{mockPredictProduct()},
 	}
+	//// Specify the list of IDs that need to be filtered by Byteplus recommendation service.
+	//filterItems := []*protocol.PredictFilterItem{
+	//	{
+	//		Id: "632461",
+	//	},
+	//	{
+	//		Id: "632462",
+	//	},
+	//}
 	return &protocol.PredictRequest{
 		ModelId: modelID,
 		UserId:  "1457789",
 		Size:    20,
 		Scene:   scene,
 		Context: context,
+		// FilterItems: filterItems,
 		// Extra:     map[string]string{"extra_info": "extra"},
 	}
 }

@@ -381,8 +381,20 @@ message PredictRequest {
   Context context = 13;
 
   // Optional.
+  // Filter some IDs in recommendations
+  repeated PredictFilterItem filter_items = 15;
+
+  // Optional.
   // This is a catch-all field to pass all the additional information.
   // Please provide as much information as possible.
+  map<string, string> extra = 100;
+}
+
+message PredictFilterItem {
+  // item id
+  string id = 1;
+
+  // extra info
   map<string, string> extra = 100;
 }
 
