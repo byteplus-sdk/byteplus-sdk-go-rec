@@ -1,4 +1,9 @@
-# [](https://github.com/byteplus-sdk/byteplus-sdk-go-rec/compare/v0.1.10...v) (2023-11-10)
+## [0.1.11](https://github.com/byteplus-sdk/byteplus-sdk-go-rec/compare/v0.1.10...v0.1.11) (2024-07-30)
+
+
+### Features
+
+* add filter_items field 
 
 
 
