@@ -134,12 +134,14 @@ func (c *clientImpl) FinishWriteOthers(finishRequest *protocol.FinishWriteDataRe
 	return c.doFinish(finishRequest, FinishOthersUri, opts...)
 }
 
-func checkPredictRequest(projectId string, modelId string) error {
+func (c *clientImpl) FinishWrite(finishRequest *protocol.FinishWriteDataRequest,
+	opts ...option.Option) (*protocol.WriteResponse, error) {
+	return c.doFinish(finishRequest, FinishUri, opts...)
+}
+
+func checkPredictRequest(projectId string) error {
 	if projectId == "" {
 		return errors.New("project id is empty")
-	}
-	if modelId == "" {
-		return errors.New("model id is empty")
 	}
 	return nil
 }
@@ -149,7 +151,7 @@ func (c *clientImpl) Predict(request *protocol.PredictRequest,
 	if len(c.projectID) > 0 && len(request.ProjectId) == 0 {
 		request.ProjectId = c.projectID
 	}
-	if err := checkPredictRequest(request.ProjectId, request.ModelId); err != nil {
+	if err := checkPredictRequest(request.ProjectId); err != nil {
 		return nil, err
 	}
 	response := &protocol.PredictResponse{}
@@ -166,7 +168,7 @@ func (c *clientImpl) AckServerImpressions(request *protocol.AckServerImpressions
 	if len(c.projectID) > 0 && len(request.ProjectId) == 0 {
 		request.ProjectId = c.projectID
 	}
-	if err := checkPredictRequest(request.ProjectId, request.ModelId); err != nil {
+	if err := checkPredictRequest(request.ProjectId); err != nil {
 		return nil, err
 	}
 	response := &protocol.AckServerImpressionsResponse{}

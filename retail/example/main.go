@@ -35,9 +35,8 @@ const (
 	// A unique identity assigned by Bytedance.
 	projectID = "***********"
 
-	// Unique id for this model.
-	// The saas model id that can be used to get rec results from predict api, which is need to fill in URL.
-	modelID = "***********"
+	// The unique identifier for the cooperation scenario.
+	sceneName = "***********"
 )
 
 func init() {
@@ -306,7 +305,8 @@ func recommendExample() {
 
 func buildPredictRequest() *protocol.PredictRequest {
 	scene := &protocol.Scene{
-		Offset: 10,
+		SceneName: sceneName,
+		Offset:    10,
 	}
 	rootProduct := mockPredictProduct()
 	device := mockPredictDevice()
@@ -325,7 +325,7 @@ func buildPredictRequest() *protocol.PredictRequest {
 	//	},
 	//}
 	return &protocol.PredictRequest{
-		ModelId: modelID,
+		ModelId: sceneName,
 		UserId:  "1457789",
 		Size:    20,
 		Scene:   scene,
