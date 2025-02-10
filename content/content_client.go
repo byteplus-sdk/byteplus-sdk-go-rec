@@ -61,6 +61,13 @@ type Client interface {
 	// No need to finish real-time data, the system will automatically finish when entering the next day
 	FinishWriteOthers(request *protocol.FinishWriteDataRequest, opts ...option.Option) (*protocol.WriteResponse, error)
 
+	// FinishWrite
+	//
+	// Recording that some data has been written, the topic of these data is set by users.
+	// Mark at most 100 dates at a time
+	// No need to finish real-time data, the system will automatically finish when entering the next day
+	FinishWrite(request *protocol.FinishWriteDataRequest, opts ...option.Option) (*protocol.WriteResponse, error)
+
 	// Predict
 	//
 	// Gets the list of contents (ranked).

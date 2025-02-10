@@ -92,26 +92,17 @@ func main() {
 	// Write real-time user data
 	writeUsersExample()
 
-	// Finish write real-time user data
-	//finishWriteUsersExample()
-
 	// Write real-time product data
 	writeProductsExample()
-
-	// Finish write real-time product data
-	//finishWriteProductsExample()
 
 	// Write real-time user event data
 	writeUserEventsExample()
 
-	// Finish write real-time user event data
-	//finishWriteUserEventsExample()
-
 	// Write self defined topic data
 	//writeOthersExample()
 
-	// Finish write self defined topic data
-	//finishWriteOthersExample()
+	// Finish write topic data
+	//finishWriteExample()
 
 	// Get recommendation results
 	recommendExample()
@@ -153,28 +144,6 @@ func buildWriteUsersRequest(count int) *protocol.WriteDataRequest {
 	}
 }
 
-func finishWriteUsersExample() {
-	request := buildFinishUserRequest()
-	opts := defaultOptions(DefaultFinishTimeout)
-	response, err := client.FinishWriteUsers(request, opts...)
-	if err != nil {
-		logs.Error("run finish occur error, msg:%v", err)
-		return
-	}
-	if core.IsUploadSuccess(response.GetStatus().GetCode()) {
-		logs.Info("finish write user data")
-		return
-	}
-	logs.Error("fail to finish write user data, msg:%s errItems:%+v",
-		response.GetStatus(), response.GetErrors())
-}
-
-func buildFinishUserRequest() *protocol.FinishWriteDataRequest {
-	return &protocol.FinishWriteDataRequest{
-		Stage: retail.StageIncremental,
-	}
-}
-
 func writeProductsExample() {
 	// The "WriteXXX" api can transfer max to 2000 items at one request
 	request := buildWriteProductsRequest(1)
@@ -206,29 +175,6 @@ func buildWriteProductsRequest(count int) *protocol.WriteDataRequest {
 	}
 }
 
-func finishWriteProductsExample() {
-	// The "FinishXXX" api can mark max to 100 dates at one request
-	request := buildFinishProductRequest()
-	opts := defaultOptions(DefaultFinishTimeout)
-	response, err := client.FinishWriteProducts(request, opts...)
-	if err != nil {
-		logs.Error("run finish occur error, msg:%v", err)
-		return
-	}
-	if core.IsUploadSuccess(response.GetStatus().GetCode()) {
-		logs.Info("finish write product data")
-		return
-	}
-	logs.Error("fail to finish write product data, msg:%s errItems:%+v",
-		response.GetStatus(), response.GetErrors())
-}
-
-func buildFinishProductRequest() *protocol.FinishWriteDataRequest {
-	return &protocol.FinishWriteDataRequest{
-		Stage: retail.StageIncremental,
-	}
-}
-
 func writeUserEventsExample() {
 	// The "WriteXXX" api can transfer max to 2000 items at one request
 	request := buildWriteUserEventsRequest(1)
@@ -257,37 +203,6 @@ func buildWriteUserEventsRequest(count int) *protocol.WriteDataRequest {
 		Stage: retail.StageIncremental,
 		Data:  marshalUserEvents,
 		Extra: map[string]string{"extra_info": "extra"},
-	}
-}
-
-func finishWriteUserEventsExample() {
-	// The "FinishXXX" api can mark max to 100 dates at one request
-	request := buildFinishUserEventRequest()
-	opts := defaultOptions(DefaultFinishTimeout)
-	response, err := client.FinishWriteUserEvents(request, opts...)
-	if err != nil {
-		logs.Error("run finish occur error, msg:%v", err)
-		return
-	}
-	if core.IsUploadSuccess(response.GetStatus().GetCode()) {
-		logs.Info("finish user event product data")
-		return
-	}
-	logs.Error("fail to finish write user event data, msg:%s errItems:%+v",
-		response.GetStatus(), response.GetErrors())
-}
-
-func buildFinishUserEventRequest() *protocol.FinishWriteDataRequest {
-	// dates should be passed when finishing others
-	dates := []*protocol.Date{
-		{
-			Year:  2022,
-			Month: 2,
-			Day:   1,
-		}}
-	return &protocol.FinishWriteDataRequest{
-		Stage:     retail.StageIncremental,
-		DataDates: dates,
 	}
 }
 
@@ -326,14 +241,14 @@ func buildWriteOthersRequest(topic string) *protocol.WriteDataRequest {
 	}
 }
 
-func finishWriteOthersExample() {
+func finishWriteExample() {
 	// The "FinishXXX" api can mark max to 100 dates at one request
 	// The `topic` is datatype, which specify the type of data users are going to finish writing.
 	// It is temporarily set to "video", the specific value depends on your need.
 	topic := "video"
-	request := buildFinishOthersRequest(topic)
+	request := buildFinishRequest(topic)
 	opts := defaultOptions(DefaultFinishTimeout)
-	response, err := client.FinishWriteOthers(request, opts...)
+	response, err := client.FinishWrite(request, opts...)
 	if err != nil {
 		logs.Error("run finish occur error, msg:%v", err)
 		return
@@ -346,7 +261,7 @@ func finishWriteOthersExample() {
 		response.GetStatus(), response.GetErrors())
 }
 
-func buildFinishOthersRequest(topic string) *protocol.FinishWriteDataRequest {
+func buildFinishRequest(topic string) *protocol.FinishWriteDataRequest {
 	// dates should be passed when finishing others
 	dates := []*protocol.Date{
 		{
