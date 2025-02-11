@@ -101,7 +101,7 @@ func main() {
 	//writeOthersExample()
 
 	// Finish write topic data
-	//finishWriteExample()
+	finishWriteExample()
 
 	// Get recommendation results
 	recommendExample()
