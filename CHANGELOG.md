@@ -1,4 +1,4 @@
-## [0.1.12](https://github.com/byteplus-sdk/byteplus-sdk-go-rec/compare/v0.1.10...v0.1.11) (2025-02-12)
+## [0.1.12](https://github.com/byteplus-sdk/byteplus-sdk-go-rec/compare/v0.1.11...v0.1.12) (2025-02-12)
 
 
 ### Features
