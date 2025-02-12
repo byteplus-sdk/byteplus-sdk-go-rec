@@ -36,6 +36,7 @@ const (
 	projectID = "***********"
 
 	// The unique identifier for the cooperation scenario.
+	// Please keep it consistent with the 'Scene name' configured in 'Slot management'.
 	sceneName = "***********"
 )
 
@@ -242,9 +243,9 @@ func buildWriteOthersRequest(topic string) *protocol.WriteDataRequest {
 
 func finishWriteExample() {
 	// The "FinishXXX" api can mark max to 100 dates at one request
-	// The `topic` is datatype, which specify the type of data users are going to finish writing.
-	// It is temporarily set to "video", the specific value depends on your need.
-	topic := "video"
+	// When using "WriteUsers", "WriteContents", and "WriteUserEvents" API, the topics are "user", "content", and "user_event" respectively.
+	// When using the WriteOthers API, the topic here is the same as the topic in WriteOthers.
+	topic := "user"
 	request := buildFinishRequest(topic)
 	opts := defaultOptions(DefaultFinishTimeout)
 	response, err := client.FinishWrite(request, opts...)
