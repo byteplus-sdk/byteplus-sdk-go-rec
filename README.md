@@ -1,5 +1,9 @@
 ## byteplus rec go sdk
 
+## Security and privacy
+This project takes security seriously.
+For vulnerability reporting and supported versions, see [SECURITY.md](SECURITY.md)
+
 #### Install the client library
 ```go
 // add this to "go.mod"
